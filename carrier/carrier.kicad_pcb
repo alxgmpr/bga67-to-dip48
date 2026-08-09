@@ -1484,7 +1484,7 @@
 	)
 	(zone
 		(net "GND")
-		(layer "In1.Cu")
+		(layer "In2.Cu")
 		(uuid "ed6a53b7-9176-4f9d-a3cd-e2209ab361f9")
 		(name "GND")
 		(hatch edge 0.5)
