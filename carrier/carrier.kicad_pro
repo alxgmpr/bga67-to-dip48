@@ -560,12 +560,12 @@
         "pattern": "IO*"
       },
       {
-        "netclass": "Signal",
-        "pattern": "slash"
+        "netclass": "Power",
+        "pattern": "VCC"
       },
       {
         "netclass": "Power",
-        "pattern": "VCC|GND"
+        "pattern": "GND"
       }
     ]
   },
