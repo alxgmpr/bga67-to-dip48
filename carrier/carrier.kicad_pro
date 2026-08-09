@@ -557,7 +557,7 @@
     "netclass_patterns": [
       {
         "netclass": "Signal",
-        "pattern": "IO*"
+        "pattern": "/*"
       },
       {
         "netclass": "Power",
