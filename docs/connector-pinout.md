@@ -33,7 +33,24 @@ G1–G4 (retention tabs, both ends) → GND on both boards.
 
 Use these exact strings on both boards — the net classes key off them.
 
-`IO1`–`IO8`, `nCE`, `nWE`, `nRE`, `CLE`, `ALE`, `nWP`, `RY_nBY`, `VCC`, `GND`
+`IO1`–`IO8`, `/CE`, `/WE`, `/RE`, `/WP`, `CLE`, `ALE`, `RY//BY`, `VCC`, `GND`
+
+The pinout table above uses `nCE`-style names for readability; the actual nets carry the
+datasheet's slash form. KiCad escapes these as `{slash}CE` in the file format — that is
+normal, not corruption.
+
+### Net class patterns
+
+Net classes `Power` and `Signal` are defined in both projects, but the patterns that bind
+nets to them must be entered in Board Setup → Net Classes → Patterns (the MCP tooling
+cannot write them). Add:
+
+| pattern | net class |
+|---|---|
+| `IO*` | Signal |
+| `/CE` `/WE` `/RE` `/WP` | Signal |
+| `CLE` `ALE` `RY//BY` | Signal |
+| `VCC` `GND` | Power |
 
 ## Do not permute the data bus
 
