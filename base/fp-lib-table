@@ -1,7 +1,7 @@
 (fp_lib_table
   (version 7)
 
-  (lib (name "bga67-to-dip") (type "KiCad") (uri "${KIPRJMOD}/../carrier/lib/carrier.pretty") (options "") (descr ""))
+  (lib (name "carrier") (type "KiCad") (uri "${KIPRJMOD}/../carrier/lib/carrier.pretty") (options "") (descr ""))
 
   (lib (name "Connector_Hirose_DF40") (type "KiCad") (uri "${KIPRJMOD}/../carrier/lib/Connector_Hirose_DF40.pretty") (options "") (descr ""))
 )

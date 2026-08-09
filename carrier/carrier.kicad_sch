@@ -5122,7 +5122,7 @@
 		(uuid "f329db21-2091-4dba-88b0-48a8cd96b37d")
 	)
 	(symbol
-		(lib_id "bga67-to-dip:DF40GB-30DP-0.4V_51_")
+		(lib_id "carrier:DF40GB-30DP-0.4V_51_")
 		(at 170.18 92.71 0)
 		(unit 1)
 		(body_style 1)
@@ -5454,7 +5454,7 @@
 		)
 	)
 	(symbol
-		(lib_id "bga67-to-dip:TC58NVG1S3HBAI6")
+		(lib_id "carrier:TC58NVG1S3HBAI6")
 		(at 59.69 52.07 0)
 		(unit 1)
 		(body_style 1)
@@ -5487,7 +5487,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "bga67-to-dip:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm"
+		(property "Footprint" "carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm"
 			(at 59.69 52.07 0)
 			(hide yes)
 			(show_name no)
