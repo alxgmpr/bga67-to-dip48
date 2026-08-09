@@ -5289,7 +5289,7 @@
 			(uuid "0bfde190-f02f-4897-bb49-ea3db6375a0b")
 		)
 		(instances
-			(project "bga67-to-dip"
+			(project "carrier"
 				(path "/35aefae1-b7b4-44f2-b6e6-ae33bc9564cb"
 					(reference "J1")
 					(unit 1)
@@ -5367,7 +5367,7 @@
 			(uuid "a6927704-610e-43ed-a4f0-869ebc2d9c26")
 		)
 		(instances
-			(project "bga67-to-dip"
+			(project "carrier"
 				(path "/35aefae1-b7b4-44f2-b6e6-ae33bc9564cb"
 					(reference "#PWR04")
 					(unit 1)
@@ -5445,7 +5445,7 @@
 			(uuid "f557ef39-bed4-411d-b615-45222d3e60bf")
 		)
 		(instances
-			(project "bga67-to-dip"
+			(project "carrier"
 				(path "/35aefae1-b7b4-44f2-b6e6-ae33bc9564cb"
 					(reference "#PWR01")
 					(unit 1)
@@ -5722,7 +5722,7 @@
 			(uuid "ba36c0f9-5ea6-4a75-89c1-fedd03122fb6")
 		)
 		(instances
-			(project "bga67-to-dip"
+			(project "carrier"
 				(path "/35aefae1-b7b4-44f2-b6e6-ae33bc9564cb"
 					(reference "U1")
 					(unit 1)
@@ -5800,7 +5800,7 @@
 			(uuid "e71ff6e9-a596-4185-aa45-fae6050a3d9a")
 		)
 		(instances
-			(project "bga67-to-dip"
+			(project "carrier"
 				(path "/35aefae1-b7b4-44f2-b6e6-ae33bc9564cb"
 					(reference "#PWR03")
 					(unit 1)
@@ -5878,7 +5878,7 @@
 			(uuid "c0434729-6a7c-4c93-9fdc-db1a0dba875e")
 		)
 		(instances
-			(project "bga67-to-dip"
+			(project "carrier"
 				(path "/35aefae1-b7b4-44f2-b6e6-ae33bc9564cb"
 					(reference "#PWR02")
 					(unit 1)

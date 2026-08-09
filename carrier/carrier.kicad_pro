@@ -488,7 +488,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "bga67-to-dip.kicad_pro",
+    "filename": "carrier.kicad_pro",
     "version": 3
   },
   "net_settings": {
@@ -694,7 +694,7 @@
     "subpart_id_separator": 0,
     "top_level_sheets": [
       {
-        "filename": "bga67-to-dip.kicad_sch",
+        "filename": "carrier.kicad_sch",
         "name": "Root",
         "uuid": "35aefae1-b7b4-44f2-b6e6-ae33bc9564cb"
       }

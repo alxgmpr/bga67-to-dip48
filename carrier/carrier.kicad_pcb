@@ -184,7 +184,7 @@
 		)
 		(path "/014f9d52-b13f-41ad-853e-c87925cd67d8")
 		(sheetname "/")
-		(sheetfile "bga67-to-dip.kicad_sch")
+		(sheetfile "carrier.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -605,7 +605,7 @@
 		)
 		(path "/9ecbb2b0-ef7d-47cb-ac39-64c4f2ef81e8")
 		(sheetname "/")
-		(sheetfile "bga67-to-dip.kicad_sch")
+		(sheetfile "carrier.kicad_sch")
 		(units
 			(unit
 				(name "A")
