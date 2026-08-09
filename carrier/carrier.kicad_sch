@@ -1735,7 +1735,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "bga67-to-dip:DF40GB-30DP-0.4V_51_"
+		(symbol "carrier:DF40GB-30DP-0.4V_51_"
 			(pin_names
 				(offset 1.016)
 			)
@@ -2424,7 +2424,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "bga67-to-dip:TC58NVG1S3HBAI6"
+		(symbol "carrier:TC58NVG1S3HBAI6"
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
