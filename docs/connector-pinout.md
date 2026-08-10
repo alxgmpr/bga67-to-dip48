@@ -26,25 +26,40 @@ The receptacle footprint is **mirrored in X** relative to the plug — pin 1 sit
 because the boards mate face to face. See "Mirror check" below.
 
 Pins 1/2 are a facing pair at one end; odd pins are one row, even the other, 0.4 mm pitch.
-Layout is a checkerboard: every signal has GND directly opposite and GND on both in-row sides.
+Layout is a checkerboard: no signal is ever adjacent to or directly opposite another signal.
+Separators are GND except at pins 10 and 14, where VCC does the job — acceptable because VCC
+is an AC ground given the decoupling on board B. The two rows are offset by 0.4 mm, so odd-row
+signals sit opposite even-row separators and vice versa.
 
 | x pos | Odd row | Even row |
 |------:|---------|----------|
-|  1 | **1** IO1 | 2 GND |
-|  2 | 3 GND | **4** nCE |
-|  3 | **5** IO2 | 6 GND |
-|  4 | 7 GND | **8** CLE |
-|  5 | **9** IO3 | 10 GND |
-|  6 | 11 GND | **12** ALE |
-|  7 | **13** IO4 | 14 GND |
-|  8 | 15 VCC | **16** nWE |
-|  9 | **17** IO5 | 18 GND |
-| 10 | 19 VCC | **20** nRE |
-| 11 | **21** IO6 | 22 GND |
-| 12 | 23 GND | **24** nWP |
-| 13 | **25** IO7 | 26 GND |
-| 14 | 27 GND | **28** RY_nBY |
-| 15 | **29** IO8 | 30 GND |
+|  1 | **1** IO4 | 2 GND |
+|  2 | 3 GND | **4** IO7 |
+|  3 | **5** IO3 | 6 GND |
+|  4 | 7 GND | **8** IO5 |
+|  5 | **9** IO2 | 10 VCC |
+|  6 | 11 GND | **12** IO8 |
+|  7 | **13** IO1 | 14 VCC |
+|  8 | 15 GND | **16** IO6 |
+|  9 | **17** CLE | 18 GND |
+| 10 | 19 GND | **20** RY//BY |
+| 11 | **21** /RE | 22 GND |
+| 12 | 23 GND | **24** /WE |
+| 13 | **25** ALE | 26 GND |
+| 14 | 27 GND | **28** /CE |
+| 15 | **29** /WP | 30 GND |
+
+**This assignment is derived from the flash's ball geometry, not chosen by hand.** The
+VFBGA67's used balls fall into two clusters: columns 2–4 (upper half) carry IO1–IO4 and
+the four control lines CLE/RE/ALE/WP, and columns 5–7 (lower half) carry IO5–IO8, the
+remaining control lines and both VCC balls. That is exactly 8 and 7 signals — and J1's odd
+row has exactly 8 signal slots, its even row exactly 7. The split has zero slack, so the
+row assignment is forced. Within a row, pins are ordered by ball x, which makes the escape
+fan out monotonically and keeps the connector fanout crossing-free.
+
+Consequently **IO1–IO8 are not in pin order on the connector**, and that is deliberate. See
+"Do not permute the data bus" below — the rule is about the end-to-end mapping, not the
+connector pin order.
 
 G1–G4 (retention tabs, both ends) → GND on both boards.
 
@@ -81,7 +96,15 @@ to Power (0.4 mm).
 
 Commands and addresses travel over the same I/O pins as data. Swapping IO lines does not
 merely byte-swizzle a dump — it corrupts the command byte and the device will not respond.
-IO1→IO8 stay in order end to end.
+
+**The rule is about the end-to-end mapping**: flash ball IO*n* must reach TSOP48 socket
+IO*n*. It says nothing about which J1 pin carries which net in between. Permuting the
+connector assignment is safe — and is what the table above does — provided both boards use
+the same table. `tools/pinout.py` holds the canonical table plus a checker that asserts the
+checkerboard invariant and the full net set; both schematics were generated from it. Run
+`python3 tools/pinout.py` after any edit.
+
+What would break the device is editing one board's J1 assignment without the other.
 
 ## Mirror check
 
