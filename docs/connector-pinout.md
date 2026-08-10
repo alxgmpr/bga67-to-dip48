@@ -27,7 +27,7 @@ because the boards mate face to face. See "Mirror check" below.
 
 Pins 1/2 are a facing pair at one end; odd pins are one row, even the other, 0.4 mm pitch.
 Layout is a checkerboard: no signal is ever adjacent to or directly opposite another signal.
-Separators are GND except at pins 10 and 14, where VCC does the job — acceptable because VCC
+Separators are GND except at pins 6 and 10, where VCC does the job — acceptable because VCC
 is an AC ground given the decoupling on board B. The two rows are offset by 0.4 mm, so odd-row
 signals sit opposite even-row separators and vice versa.
 
@@ -35,11 +35,11 @@ signals sit opposite even-row separators and vice versa.
 |------:|---------|----------|
 |  1 | **1** IO4 | 2 GND |
 |  2 | 3 GND | **4** IO7 |
-|  3 | **5** IO3 | 6 GND |
+|  3 | **5** IO3 | 6 VCC |
 |  4 | 7 GND | **8** IO5 |
 |  5 | **9** IO2 | 10 VCC |
 |  6 | 11 GND | **12** IO8 |
-|  7 | **13** IO1 | 14 VCC |
+|  7 | **13** IO1 | 14 GND |
 |  8 | 15 GND | **16** IO6 |
 |  9 | **17** CLE | 18 GND |
 | 10 | 19 GND | **20** RY//BY |
@@ -55,7 +55,8 @@ the four control lines CLE/RE/ALE/WP, and columns 5–7 (lower half) carry IO5�
 remaining control lines and both VCC balls. That is exactly 8 and 7 signals — and J1's odd
 row has exactly 8 signal slots, its even row exactly 7. The split has zero slack, so the
 row assignment is forced. Within a row, pins are ordered by ball x, which makes the escape
-fan out monotonically and keeps the connector fanout crossing-free.
+fan out monotonically and keeps the connector fanout crossing-free. VCC takes separator
+pins 6 and 10, whose x lines up with the VCC balls H5 and G7.
 
 Consequently **IO1–IO8 are not in pin order on the connector**, and that is deliberate. See
 "Do not permute the data bus" below — the rule is about the end-to-end mapping, not the
