@@ -72,8 +72,9 @@ hand-soldering a 0.4 mm-pitch connector.
 
 ## State
 
-Both schematics are drawn, wired and ERC-clean. The carrier PCB has nets imported and its
-stackup set; neither board is placed or routed yet.
+Both schematics are drawn, wired and ERC-clean. **The carrier is finished** — placed,
+routed, 0 DRC violations, 0 unconnected — and panelized. Board B has a schematic and
+footprints but no layout yet.
 
 **The TSOP48 pinout is unverified.** It comes from the JEDEC standard, not from the Kioxia
 datasheet, which documents only the BGA. Ring it out against the physical XGecu adapter

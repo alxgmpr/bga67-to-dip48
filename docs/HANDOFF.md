@@ -39,8 +39,10 @@ pin 1 to pin 24) while the flash carrier wants to be small and replicated:
   violations, every label dangling, and the netlist collapsed to 2 nets with all 67 U1 pads
   shorted together. If you ever rename a project library, grep the schematic for the old
   nickname — a stale cache key fails silently and still opens.
-- `carrier/` PCB: nets imported, U1 fpid corrected, 4 copper layers on a JLCPCB 1.6 mm
-  stackup, GND pour on In2.Cu. DRC clean, 37 unconnected (nothing routed).
+- `carrier/` PCB is **placed, routed and DRC-clean** — 0 violations, 0 unconnected.
+  9.25 × 7.45 mm, 4 layers, one via per signal net (20) plus 15 GND stitching vias around
+  the perimeter, uniform 0.15 mm tracks, teardrops throughout, GND poured on all four
+  layers (In1/In2 at 52.1 mm² each of 68.9).
 - `base/` schematic is drawn and wired. ERC clean, 17 nets, cross-checked against both
   tables in `connector-pinout.md`.
 - Custom parts, all built from the datasheet/catalog and cross-checked against source
@@ -55,14 +57,16 @@ pin 1 to pin 24) while the flash carrier wants to be small and replicated:
 - Design rules and net classes set on both projects (see below).
 - `docs/connector-pinout.md` — the interface contract between the two boards.
 
+- `panel/carrier-panel.kicad_pcb` — 4×4 mouse-bite panel, 52.9 × 45.7 mm, 16 up.
+
 **Not done:**
 
-- `carrier/` PCB layout — nothing placed or routed.
 - `base/` PCB — 4 layers and net classes are set, but nothing imported or placed.
+  **Place the 100 nF within ~2 mm of the receptacle's VCC pins** — the carrier has no
+  local decoupling, by design (see the BOM section).
 - No 3D model on the DF40 30-pin plug or receptacle footprints. The STEP files under
   `carrier/lib/` are the **48**-pin part, not the 30-pin one.
-- No decoupling caps in the `carrier/` schematic. The BOM below lists 2× 100 nF; they are
-  not drawn yet.
+- TSOP48 pinout still unverified against the physical XGecu adapter.
 
 ## Stack height — settled, and not the way you would guess
 
@@ -142,8 +146,13 @@ JLCPCB, **4 layers**, ENIG. L2 must be a solid ground pour spanning the ball fie
 - **Keep board-level solder mask expansion at 0.** The DF40 has only 0.17 mm of copper gap
   at 0.4 mm pitch; any global expansion drops its mask dams below 0.10 mm. The BGA carries
   its own +0.05 margin at footprint level.
-- `min_copper_edge_clearance` is still KiCad's 0.5 mm. JLC allows 0.2. Worth changing —
-  0.5 costs a millimetre of width on a 12 mm board.
+- `min_copper_edge_clearance` is **0.2 mm** (was KiCad's 0.5). JLC allows 0.2, and 0.5 was
+  costing a millimetre of width.
+- **Trace geometry is not what costs money at JLC.** 4-layer 1 oz is 0.09/0.09 mm standard
+  and they explicitly allow 3 mil in BGA fanouts. The surcharge is on drilling: *"0.2mm or
+  0.25mm hole size with via diameter less than 0.45mm, will cost more."* The vias are
+  0.45/0.20 — exactly on the free boundary. **Do not shrink the via pad below 0.45.**
+- Minimum board size is 3 × 3 mm for FR4 at ≥0.6 mm thickness, so there is headroom left.
 
 ## Hard constraints
 
@@ -151,8 +160,9 @@ JLCPCB, **4 layers**, ENIG. L2 must be a solid ground pour spanning the ball fie
   the passives go on **B.Cu**, the outward face, where they have unlimited headroom — the
   VFBGA67 is 1.00 mm max tall, so it would physically fit in a 1.5 mm gap, but it does not
   live there. B.Cu therefore carries the parts; nothing but the connector sits on F.Cu.
-  There are 2.5 mm strips either side of the BGA courtyard and 2.75 mm at each end (courtyard
-  8.5 × 7.0 on a 14 × 12 board, i.e. U1 rotated 90°) — enough for the two 0402s.
+  U1 is rotated 90°, so the 8.0 × 6.5 package sits 8.0 wide. The board is now trimmed to
+  9.25 × 7.45 mm, which leaves ≥0.32 mm to the package body and ≥0.36 mm to copper — no room
+  for passives on either face, which is why decoupling moved to board B.
 - **The 47 NC balls float.** Do not tie them to ground.
 - **Do not permute the data bus.** Commands and addresses travel over the same I/O pins;
   a swizzle corrupts the command byte, it does not merely scramble a dump.
