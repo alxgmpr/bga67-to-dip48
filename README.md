@@ -6,7 +6,7 @@ flash carrier can be swapped without rebuilding the DIP48 field.
 | | Board | Contents | Size |
 |---|---|---|---|
 | A | `carrier/` | KIOXIA TC58NVG1S3HBAI6 (VFBGA-67) + DF40 30-pin plug | 9.25 × 7.45 mm |
-| B | `base/` | DIP48 socket + DF40 30-pin receptacle + pull-ups + bulk | ~63 × 20 mm |
+| B | `base/` | DIP48 SMT socket field + DF40 30-pin receptacle + pull-ups + bulk | 30 × 90 mm |
 
 The DIP48 span is fixed by the socket — 23 × 2.54 = 58.42 mm from pin 1 to pin 24 — which is
 why the boards are split. Only the carrier needs to be small and repeatable.
@@ -28,10 +28,13 @@ model path is `${KIPRJMOD}/lib/3d/...`; moving the directory would break that re
 
 - **F.Cu is the carrier's mating face.** Only the DF40 plug lives there. U1 and the passives
   go on B.Cu, the outward face.
-- **Stack height is 1.5 mm and is not a free choice.** The plug is a shielded `DF40GB`, and
-  that family offers 30 positions at 1.5 mm only. No DF40 family reaches 4.0 mm at 30
-  positions. See `docs/connector-pinout.md`.
-- **DF40 is rated 30 mating cycles.** Keep the repeated joint at the DIP48/ZIF end, not here.
+- **Stack height is 4.0 mm**, via the `DF40T` (125 °C) family — the only DF40 that does 30
+  positions at 4.0 mm. The plug part number carries no height, so the receptacle alone sets
+  the gap. See `docs/connector-pinout.md`.
+- **DF40TC is rated 10 mating cycles**, not 30. Keep the repeated joint at the DIP48/ZIF
+  end, not here.
+- **The DIP48 field is surface mount** — two 1×24 socket strips with staggered tails, so
+  nothing protrudes below the board into the carrier's space.
 - **The 47 NC balls float.** Do not ground them.
 - **Data bus order is load-bearing** — commands and addresses share the I/O pins. See
   `docs/connector-pinout.md`.
@@ -49,7 +52,7 @@ board as `/IO1` rather than `IO1`.
 
 ## Panel
 
-`panel/carrier-panel.kicad_pcb` is a 4×4 mouse-bite panel, 52.9 × 45.7 mm, generated from
+`panel/carrier-panel.kicad_pcb` is a 4×4 mouse-bite panel, 56.80 × 49.60 mm, generated from
 the single board. **Everything under `panel/` except `fp-lib-table` is disposable output.**
 Close KiCad, then:
 
@@ -75,10 +78,28 @@ connector.
 
 ## State
 
-Both schematics are drawn, wired and ERC-clean. **The carrier is finished** — placed,
-routed, 0 DRC violations, 0 unconnected — and panelized. Board B has a schematic and
-footprints but no layout yet.
+Both schematics are drawn, wired and ERC-clean.
+
+**The carrier is finished** — placed, routed, 0 DRC violations, 0 unconnected — and
+panelized.
+
+**Board B is routed**: 0 DRC violations, 6 unconnected items, all understood:
+
+- `J1.6` (VCC). One of the connector's two VCC contacts. It is enclosed on B.Cu by IO5's
+  and IO7's hand routes, which pass 0.4 mm away — exactly the via limit — so it has
+  neither a via nor a corridor of its own. VCC reaches the flash through `J1.10`, and pin
+  6 is still tied to VCC on the carrier, so it is at VCC potential and still acts as the
+  AC-ground separator the checkerboard wants. Freeing it means re-routing IO5/IO7 by hand.
+- 5 detached GND pour fragments — slivers of F.Cu trapped between the 48 SMD pads and the
+  19 landing stubs. `ZONE_MIN_THICKNESS` is held at 0.15 mm because the pour has to reach
+  a 0.4 mm-pitch connector, so they cannot simply be squeezed out.
 
 **The TSOP48 pinout is unverified.** It comes from the JEDEC standard, not from the Kioxia
 datasheet, which documents only the BGA. Ring it out against the physical XGecu adapter
 before ordering board B.
+
+**The DF40TC plug's end pads are unverified.** The DF40T catalog's plug land drawing
+carries 0.475 and 0.35 dimensions at each end that could be hold-down pads, but `TC` means
+no retention tab. The footprint omits them, which is the safe error: if the part does have
+hold-downs they simply go unsoldered, whereas pads under a housing that has no metal there
+would collect paste and tilt the connector.

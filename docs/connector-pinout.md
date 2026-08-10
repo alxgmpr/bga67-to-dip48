@@ -3,24 +3,47 @@
 **Single source of truth.** `carrier` and `base` are separate KiCad projects, so nothing
 cross-checks them. Any change here must be applied to both boards in the same commit.
 
-- Carrier (board A): `DF40GB-30DP-0.4V(51)` plug
-- Base (board B): `DF40GB(1.5)-30DS-0.4V(51)` receptacle, HRS `CL0684-4198-4-51`
+- Carrier (board A): `DF40TC-30DP-0.4V(51)` plug, HRS `CL0684-4263-0-51`
+- Base (board B): `DF40TC(4.0)-30DS-0.4V(51)` receptacle, HRS `CL0684-4256-0-51`
 
-**Stack height is 1.5 mm and is not a free choice.** `DF40GB` is the *shielded* DF40
-family. Per the DF40 catalog, the shielded stacking-height matrix offers 30 positions at
-1.5 mm only, and `DF40GB(1.5)-30DS-0.4V(51)` is its sole 30-position mating receptacle
-(30 signal + 4 ground). The unshielded families reach 2.0/2.5/3.0/3.5 mm at 30 positions,
-and **no** DF40 reaches 4.0 mm at 30 positions — 4.0 mm exists only at 50, 60, 80 and 90.
-Going above 1.5 mm therefore means re-specifying the carrier's plug, not just the
-receptacle.
+**Stack height is 4.0 mm.** Getting there meant leaving the shielded `DF40GB` family,
+which offers 30 positions at 1.5 mm only. Plain `DF40C`/`DF40HC` stop at 3.5 mm at 30
+positions. **`DF40T` (125 °C, automotive) does 30 positions at 4.0 mm and it is mass
+production** — see the DF40T/DF40GT catalog (Jan 2026) p.2 variation matrix and the p.8
+combinations table. 4.5–7.0 mm at 30 positions is still Under Planning, so 4.0 mm is the
+ceiling for this pin count in any DF40 family.
+
+**The plug carries no stacking height in its part number.** One `DF40TC-30DP-0.4V(51)`
+serves every height from 1.5 to 4.0 mm; the receptacle sets the gap. If the stack height
+ever changes again, only board B's part number moves.
+
+What the DF40T family costs, relative to the DF40GB pair it replaced:
+
+| | DF40GB (was) | DF40TC (now) |
+|---|---|---|
+| Stack height, 30 pos | 1.5 mm only | 1.5 / 2.0 / 2.5 / 3.0 / 3.5 / **4.0** mm |
+| Rated current | 0.5 A | 0.3 A (flash draws 30 mA) |
+| Mating durability | 30 cycles | **10 cycles** |
+| Shield | yes | no |
+| Retention tabs | G1–G4 | **none** |
+
+The 10-cycle rating sharpens a rule that was already in this document: the repeatedly
+separated joint is the DIP48/ZIF end, not the mezzanine.
 
 Receptacle land pattern (catalog p.12, "Recommended PCB Pattern" &lt;30 pos.&gt;):
 
 ```
 signal  0.2 x 0.70  at y = +-1.54, x = -2.8 .. +2.8 step 0.4   (pitch 0.4, span 5.6)
-ground  0.28 x 0.72 at x = +-3.24, y = +-1.68                   (span 6.48 ctr-to-ctr)
-body    8.64 x 3.38, height 1.45
+body    8.6 x 3.38, 3.90 above board
 ```
+
+There are no ground/retention pads: `TC` means no retention tab. The signal geometry is
+byte-for-byte what the DF40GB pair used — DF40 catalog p.10 gives the No-Retention-Tab
+receptacle pattern as rows 3.78 outer / 2.38 inner (so 0.70 long at y = ±1.54) and
+0.2 wide, and DF40T catalog p.9 gives the plug as rows 3.37/2.05 (0.66 long at
+y = ±1.355) and 0.23 wide, both at P=0.4 and B=5.60. **Every one of the 30 signal pads is
+unmoved on both boards**; only G1–G4 disappeared. That is why raising the stack height
+cost no re-routing.
 
 The receptacle footprint is **mirrored in X** relative to the plug — pin 1 sits at +X —
 because the boards mate face to face. See "Mirror check" below.
@@ -62,7 +85,9 @@ Consequently **IO1–IO8 are not in pin order on the connector**, and that is de
 "Do not permute the data bus" below — the rule is about the end-to-end mapping, not the
 connector pin order.
 
-G1–G4 (retention tabs, both ends) → GND on both boards.
+G1–G4 are gone. `DF40TC` has no retention tabs, so both footprints drop those four pads
+and the schematics no longer tie them to GND. J1's ground return is unaffected: the
+checkerboard already puts 13 GND pins in the signal field.
 
 ## Net names
 
@@ -152,10 +177,32 @@ carrying a chip. The repo ships Gerbers and a schematic PDF only, no CAD source.
 
 ## DIP48 side (base board)
 
-Board B presents a **48-pin DIP socket** (female), 2.54 mm pitch, 0.6″ / 15.24 mm row
-spacing, footprint `base:DIP-48_Socket_W15.24mm_P2.54mm`. The XGecu adapter carries the
+Board B presents a **48-position DIP socket field built from two 1×24 surface-mount
+socket strips** (Samtec `SSM-124-L-SV` class), 2.54 mm pitch, 0.6″ / 15.24 mm row spacing,
+footprint `base:DIP-48_SocketStrip_SMD_W15.24mm_P2.54mm`. The XGecu adapter carries the
 male DIP48 pins and inserts into it from above. Both parts are viewed from the top, so the
 socket is **not** mirrored — unlike the DF40 pair.
+
+**It is surface mount, so nothing protrudes below the board** and the carrier mezzanine
+underneath is unobstructed. No one-piece SMT DIP48 at 0.6″ exists in distribution, which
+is why it is two strips rather than one part.
+
+The tails **stagger ±1.65 mm** either side of each row centreline, alternating, which is
+how SMT socket strips fit a 2.54 mm pitch. Consequences worth knowing:
+
+- All 48 pad **Y coordinates are unchanged** from the through-hole footprint, and the row
+  centrelines still sit 15.24 mm apart — that is what the adapter's pins seat on.
+- The inner pad edges leave a **10.04 mm channel** between the rows. The carrier is
+  7.45 mm wide, so it still clears, with ~1.3 mm either side.
+- SMD pads live on **F.Cu only**. Every net on this board arrives from B.Cu or an inner
+  layer, so each used pad gets a 0.15 mm F.Cu stub back to its row centreline and a
+  0.45/0.20 via there — placed by `tools/route_base.py`. The via sits exactly where the
+  through-hole pad centre used to be, so every existing route still lands where it always
+  did. The 1.4 mm gap between the staggered pad columns takes that via with 0.475 mm of
+  copper clearance, well over the 0.1 mm rule.
+- **48 SMT contacts now take the full DIP insertion force with no through-hole anchor.**
+  This is the highest-force and most-cycled joint on the board. If pads start lifting,
+  that is the reason, and mounting hardware is the fix.
 
 All 48 positions are drilled even though only 19 carry nets; populating the full socket is
 cheaper mechanically than a partial one and gives the adapter even support.

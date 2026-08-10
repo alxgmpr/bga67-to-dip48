@@ -308,6 +308,7 @@ LINKS = [
     ('/{slash}CE',        '28', '9'),
 ]
 ODD_OUT, EVEN_OUT = -1, +1          # escape direction by J1 row
+DIP_ROW_PITCH = 15.24               # 0.6 in between the J2 row centrelines
 B_CU_PENALTY = 12.0                 # mm of notional cost; see escape_and_route
 
 
@@ -355,6 +356,53 @@ def fix_zones(board):
         if before != after:
             changed.append((z.GetNetname(), before, after))
     return changed
+
+
+def land_smd_field(board):
+    """Give every used J2 pad a landing via on its row centreline.
+
+    J2 is a pair of surface-mount socket strips, so its pads live on F.Cu only
+    and their tails stagger +-1.65 mm either side of the row centreline. Every
+    other net on this board arrives from B.Cu or an inner layer, so a bare SMD
+    pad is unreachable.
+
+    Each used pad therefore gets a 0.15 mm F.Cu stub back to its row
+    centreline and a via there. The via sits exactly where the through-hole
+    pad centre used to be, which is the coordinate the rest of the router --
+    and all the surviving hand routing -- already targets. That is the whole
+    point: the field goes surface-mount without moving a single destination.
+
+    The 1.4 mm gap between the two staggered pad columns takes a 0.45/0.20 via
+    with 0.475 mm of copper clearance to the nearest pad edge, comfortably
+    over the 0.1 mm rule.
+
+    Runs after strip(), which has just removed the previous run's vias.
+    """
+    j2 = board.FindFootprintByReference('J2')
+    ox = mm(j2.GetPosition().x)
+    made = []
+    for p in j2.Pads():
+        net = p.GetNetCode()
+        if net == 0 or p.GetNetname().startswith('unconnected-'):
+            continue
+        px, py = mm(p.GetPosition().x), mm(p.GetPosition().y)
+        cx = ox if abs(px - ox) < DIP_ROW_PITCH / 2 else ox + DIP_ROW_PITCH
+        t = pcbnew.PCB_TRACK(board)
+        t.SetStart(pcbnew.VECTOR2I(MM(px), MM(py)))
+        t.SetEnd(pcbnew.VECTOR2I(MM(cx), MM(py)))
+        t.SetWidth(MM(TRACK))
+        t.SetLayer(F_CU)
+        board.Add(t)
+        t.SetNetCode(net)          # must follow Add()
+        v = pcbnew.PCB_VIA(board)
+        v.SetPosition(pcbnew.VECTOR2I(MM(cx), MM(py)))
+        v.SetWidth(MM(VIA_PAD))
+        v.SetDrill(MM(VIA_DRILL))
+        v.SetLayerPair(F_CU, B_CU)
+        board.Add(v)
+        v.SetNetCode(net)
+        made.append(p.GetNumber())
+    return made
 
 
 def escape_and_route(m, net, src_pad, dst_pad, layers, direction, cap=None):
@@ -472,6 +520,16 @@ def plan(b, order):
         q = p.GetPosition()
         return (round(mm(q.x), 4), round(mm(q.y), 4))
 
+    j2_ox = mm(j2.GetPosition().x)
+
+    def j2t(num):
+        """Where a J2 connection actually lands: the landing via on the row
+        centreline, not the staggered SMD pad itself."""
+        q = pad(j2, num).GetPosition()
+        px, py = mm(q.x), mm(q.y)
+        cx = j2_ox if abs(px - j2_ox) < DIP_ROW_PITCH / 2 else j2_ox + DIP_ROW_PITCH
+        return (round(cx, 4), round(py, 4))
+
     m = Model(b)
     log, failed = [], []
 
@@ -487,7 +545,7 @@ def plan(b, order):
                 failed.append('%s: J1.%s and J2.%s are on different nets' % (name, jp1, jp2))
                 continue
             direction = ODD_OUT if int(jp1) % 2 else EVEN_OUT
-            r = escape_and_route(m, net, xy(p1), xy(p2), (IN1, IN2), direction, cap)
+            r = escape_and_route(m, net, xy(p1), j2t(jp2), (IN1, IN2), direction, cap)
             if r is None:
                 again.append((name, jp1, jp2))
                 continue
@@ -501,22 +559,55 @@ def plan(b, order):
 
     # J1's two VCC pins are on the even row with IO5 between them, so they
     # cannot be bridged along the row. Give each its own escape.
-    tgt = xy(pad(j2, '37'))
-    for pin in ('6', '10'):
+    # Either DIP VCC pin will do -- they are bridged to each other further
+    # down -- so a pin that cannot reach 37 is offered 12 before giving up.
+    #
+    # Pin 10 goes first and pin 6 gets its via as a last resort. Both sit on
+    # J1's even row with IO5 at pin 8 wedged between them, so they cannot be
+    # bridged along the row, and pin 6 is the more boxed-in of the two: its
+    # neighbours' hand routing leaves it no corridor of its own. Reaching the
+    # via pin 10 has already placed 0.8 mm away is the short way out, and it
+    # is the same net.
+    vcc_via = None
+    for pin in ('10', '6'):
         pp = xy(pad(j1, pin))
-        r = escape_and_route(m, vcc, pp, tgt, (IN1, IN2), EVEN_OUT, None)
+        r, dst = None, None
+        targets = [('37', j2t('37')), ('12', j2t('12'))]
+        if vcc_via is not None:
+            targets.append(('J1.10 via', vcc_via))
+        for dst, tgt in targets:
+            r = escape_and_route(m, vcc, pp, tgt, (IN1, IN2), EVEN_OUT, None)
+            if r is not None:
+                break
         if r is None:
-            failed.append('VCC J1.%s->J2.37' % pin)
+            # Pin 6 has no escape of its own: going outward the stub is clear
+            # but no via will fit, and going inward a via fits but the stub is
+            # blocked. It does not need one. Pin 10 is the same net, 0.8 mm
+            # along the row, and already has a via -- so step out to that via's
+            # column and run down to it on B.Cu. IO5 at pin 8 sits between the
+            # two pads, which is why this cannot go straight down the row; at
+            # x = the via column the run clears pin 8's pad by 0.6 mm.
+            if vcc_via is not None:
+                jog = polyline([pp, (vcc_via[0], pp[1]), vcc_via])
+                if len(jog) >= 2 and m.track_ok(jog, B_CU, vcc, allow_pads=(pp,)):
+                    m.add_track(jog, B_CU, vcc)
+                    log.append('ok   VCC      J1.%-2s -> %-9s %-6s %-17s %.1f mm'
+                               % (pin, 'J1.10 via', b.GetLayerName(B_CU),
+                                  'no via', length(jog)))
+                    continue
+            failed.append('VCC J1.%s' % pin)
             continue
         vc, layer, path = r
-        log.append('ok   VCC      J1.%-2s -> J2.37    %-6s %-17s %.1f mm'
-                   % (pin, b.GetLayerName(layer),
+        if vc is not None and vcc_via is None:
+            vcc_via = vc
+        log.append('ok   VCC      J1.%-2s -> %-9s %-6s %-17s %.1f mm'
+                   % (pin, dst, b.GetLayerName(layer),
                       ('via (%.2f,%.2f)' % vc) if vc else 'no via', length(path)))
     # These two go last on purpose. A via pierces every layer, so an F.Cu track
     # laid across the connector's escape zone blocks vias on the inner layers
     # underneath it -- routing the VCC span first cost IO2 its via by 27 um.
     # Both of these have the whole board to detour through; the escapes do not.
-    a, c = xy(pad(r1, '2')), xy(pad(j2, '7'))
+    a, c = xy(pad(r1, '2')), j2t('7')
     net = pad(r1, '2').GetNetCode()
     if m.track_ok(polyline([a, c]), F_CU, net, allow_pads=(a, c)):
         m.add_track(polyline([a, c]), F_CU, net)
@@ -525,9 +616,9 @@ def plan(b, order):
         failed.append('RY//BY R1.2->J2.7')
 
     # The DIP has two VCC pins; bridge them. F.Cu between the rows is empty
-    # (the socket is through-hole, so only its pads are up there), but the run
+    # (F.Cu between the rows now also carries the landing stubs), but the run
     # has to dodge the escape vias, hence the corridor search.
-    a, c = xy(pad(j2, '12')), xy(pad(j2, '37'))
+    a, c = j2t('12'), j2t('37')
     span = None
     # Step clear of the pad column before running along it, or the vertical
     # leg sits on top of the pads 2.54 mm up and down the row. Then search a
@@ -643,6 +734,9 @@ def main():
     print('removed %d via/inner-layer items from the previous run' % strip(b))
     for name, before, after in fix_zones(b):
         print('zone [%s]: clearance/minw/thermal %s -> %s' % (name, before[:3], after[:3]))
+    landed = land_smd_field(b)
+    print('landing via + F.Cu stub on %d J2 pads: %s'
+          % (len(landed), ' '.join(landed)))
 
     # Order matters more than anything else here: whichever net is planned
     # first takes the corridor it wants, and a greedy pass strands whoever is
@@ -657,7 +751,9 @@ def main():
                 if p.GetNumber() == num:
                     return (mm(p.GetPosition().x), mm(p.GetPosition().y))
         a, c = pos(j1, link[1]), pos(j2, link[2])
-        return abs(a[0] - c[0]) + abs(a[1] - c[1])
+        ox = mm(j2.GetPosition().x)
+        cx = ox if abs(c[0] - ox) < DIP_ROW_PITCH / 2 else ox + DIP_ROW_PITCH
+        return abs(a[0] - cx) + abs(a[1] - c[1])
 
     seeds = [
         list(LINKS),
