@@ -110,6 +110,24 @@ trace between adjacent pads (0.400 mm available):
   0.15 trace + 2×0.10 clr = 0.350  ok
 ```
 
+**Copper clearance is not what binds — hole clearance is.** The 0.45 mm via pad clears the
+ball pads by 0.1407 mm and passes the 0.1 mm rule, but `min_hole_clearance` is 0.25 mm and it
+is measured from the *drill*, not the pad:
+
+```
+via 0.45 / 0.25 drill -> 0.5657 - 0.125 - 0.200 = 0.2407 mm   fails 0.25
+via 0.45 / 0.20 drill -> 0.5657 - 0.100 - 0.200 = 0.2657 mm   passes
+```
+
+A 0.25 mm drill throws 72 hole-clearance errors across the escape. The vias are **0.45 / 0.20**,
+which keeps a 0.125 mm annular ring, above the 0.1 mm minimum. Do not widen the drill back to
+the netclass default.
+
+Note also that netclass via/track defaults do not apply inside the ball field: Power wants a
+0.6 mm via and a 0.4 mm track, neither of which fits. Escape stubs are 0.15 mm and escape vias
+are 0.45/0.20 on every net including VCC and GND. Netclass values are defaults, not minima, so
+DRC is satisfied.
+
 A per-pad clearance override does **not** help — KiCad resolves clearance between two items
 as the largest applicable value, so loosening one side changes nothing.
 
