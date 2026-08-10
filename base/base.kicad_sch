@@ -335,7 +335,7 @@
 					)
 				)
 			)
-			(property "Footprint" "base:DIP-48_Socket_W15.24mm_P2.54mm"
+			(property "Footprint" "base:DIP-48_SocketStrip_SMD_W15.24mm_P2.54mm"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -1247,7 +1247,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "carrier:DF40GB-30DS-0.4V_51_"
+		(symbol "carrier:DF40TC_4.0_-30DS-0.4V_51_"
 			(pin_names
 				(offset 1.016)
 			)
@@ -1266,7 +1266,7 @@
 					)
 				)
 			)
-			(property "Value" "DF40GB(1.5)-30DS-0.4V(51)"
+			(property "Value" "DF40TC(4.0)-30DS-0.4V(51)"
 				(at 0 -35.56 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -1276,7 +1276,7 @@
 					)
 				)
 			)
-			(property "Footprint" ""
+			(property "Footprint" "Connector_Hirose_DF40:HIROSE_DF40TC_4.0_-30DS-0.4V_51_"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -1309,7 +1309,7 @@
 					)
 				)
 			)
-			(symbol "DF40GB-30DS-0.4V_51__0_1"
+			(symbol "DF40TC_4.0_-30DS-0.4V_51__0_1"
 				(rectangle
 					(start -7.62 -33.02)
 					(end 7.62 20.32)
@@ -1854,78 +1854,6 @@
 						)
 					)
 					(number "30"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin power_in line
-					(at 10.16 -22.86 180)
-					(length 2.54)
-					(name "GND"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "G1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin power_in line
-					(at 10.16 -25.4 180)
-					(length 2.54)
-					(name "GND"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "G2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin power_in line
-					(at 10.16 -27.94 180)
-					(length 2.54)
-					(name "GND"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "G3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin power_in line
-					(at 10.16 -30.48 180)
-					(length 2.54)
-					(name "GND"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "G4"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -3938,7 +3866,7 @@
 		)
 	)
 	(symbol
-		(lib_id "carrier:DF40GB-30DS-0.4V_51_")
+		(lib_id "carrier:DF40TC_4.0_-30DS-0.4V_51_")
 		(at 63.5 63.5 0)
 		(unit 1)
 		(body_style 1)
@@ -3959,7 +3887,7 @@
 				)
 			)
 		)
-		(property "Value" "DF40GB(1.5)-30DS-0.4V(51)"
+		(property "Value" "DF40TC(4.0)-30DS-0.4V(51)"
 			(at 63.5 40.64 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3969,7 +3897,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_Hirose_DF40:HIROSE_DF40GB-30DS-0.4V_51_"
+		(property "Footprint" "Connector_Hirose_DF40:HIROSE_DF40TC_4.0_-30DS-0.4V_51_"
 			(at 63.5 63.5 0)
 			(hide yes)
 			(show_name no)
@@ -4006,17 +3934,11 @@
 		(pin "30"
 			(uuid "4da739e8-9f1d-4ddc-9ddd-a9e2b9d6370a")
 		)
-		(pin "G3"
-			(uuid "13eef11e-f7e9-4142-811f-446550467c45")
-		)
 		(pin "23"
 			(uuid "804f1478-e1aa-48c9-9d33-d22bfb570efd")
 		)
 		(pin "29"
 			(uuid "35c9b633-7e8f-4f97-a380-e67b02ec6df2")
-		)
-		(pin "G2"
-			(uuid "2ee81da2-8823-401d-b15c-0e35e763ca29")
 		)
 		(pin "26"
 			(uuid "a76b13b5-b498-4b48-808a-34c482e9ea38")
@@ -4045,14 +3967,8 @@
 		(pin "20"
 			(uuid "339fd5de-0e10-44a8-86d4-ea8353a6a808")
 		)
-		(pin "G1"
-			(uuid "56d6c134-e88f-4711-aae0-91b697c779aa")
-		)
 		(pin "28"
 			(uuid "3c86d61b-45d9-4c91-bae7-5d427d2a15a0")
-		)
-		(pin "G4"
-			(uuid "4d467cd0-63b2-4119-8e12-0b5ee4185e46")
 		)
 		(pin "3"
 			(uuid "62df1bc3-0caf-4b53-809f-e51bb3b83efc")
@@ -4143,7 +4059,7 @@
 				)
 			)
 		)
-		(property "Footprint" "base:DIP-48_Socket_W15.24mm_P2.54mm"
+		(property "Footprint" "base:DIP-48_SocketStrip_SMD_W15.24mm_P2.54mm"
 			(at 152.4 50.8 0)
 			(hide yes)
 			(show_name no)

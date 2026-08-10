@@ -11,7 +11,7 @@
 		(company "Alex Gompper")
 	)
 	(lib_symbols
-		(symbol "carrier:DF40GB-30DP-0.4V_51_"
+		(symbol "carrier:DF40TC-30DP-0.4V_51_"
 			(pin_names
 				(offset 1.016)
 			)
@@ -30,7 +30,7 @@
 					)
 				)
 			)
-			(property "Value" "DF40GB-30DP-0.4V(51)"
+			(property "Value" "DF40TC-30DP-0.4V(51)"
 				(at 0 -35.56 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -40,7 +40,7 @@
 					)
 				)
 			)
-			(property "Footprint" ""
+			(property "Footprint" "Connector_Hirose_DF40:HIROSE_DF40TC-30DP-0.4V_51_"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -73,7 +73,7 @@
 					)
 				)
 			)
-			(symbol "DF40GB-30DP-0.4V_51__0_1"
+			(symbol "DF40TC-30DP-0.4V_51__0_1"
 				(rectangle
 					(start -7.62 -33.02)
 					(end 7.62 20.32)
@@ -618,78 +618,6 @@
 						)
 					)
 					(number "30"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin power_in line
-					(at 10.16 -22.86 180)
-					(length 2.54)
-					(name "GND"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "G1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin power_in line
-					(at 10.16 -25.4 180)
-					(length 2.54)
-					(name "GND"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "G2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin power_in line
-					(at 10.16 -27.94 180)
-					(length 2.54)
-					(name "GND"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "G3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin power_in line
-					(at 10.16 -30.48 180)
-					(length 2.54)
-					(name "GND"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "G4"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -2534,16 +2462,6 @@
 	)
 	(wire
 		(pts
-			(xy 210.82 87.63) (xy 213.36 87.63)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "133cc92a-479f-4e8e-8d77-772c1b58b692")
-	)
-	(wire
-		(pts
 			(xy 60.96 67.31) (xy 63.5 67.31)
 		)
 		(stroke
@@ -2764,16 +2682,6 @@
 	)
 	(wire
 		(pts
-			(xy 210.82 85.09) (xy 213.36 85.09)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "5f4f54b3-1a5d-48df-b294-5be4396e6f5e")
-	)
-	(wire
-		(pts
 			(xy 179.07 64.77) (xy 190.5 64.77)
 		)
 		(stroke
@@ -2794,16 +2702,6 @@
 	)
 	(wire
 		(pts
-			(xy 210.82 90.17) (xy 213.36 90.17)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6b128fed-7048-41e7-b24b-84b94da00caa")
-	)
-	(wire
-		(pts
 			(xy 179.07 59.69) (xy 179.07 64.77)
 		)
 		(stroke
@@ -2811,16 +2709,6 @@
 			(type default)
 		)
 		(uuid "6fa2f684-e676-40a8-abb6-66c769f39849")
-	)
-	(wire
-		(pts
-			(xy 210.82 82.55) (xy 213.36 82.55)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "7043f12b-4b00-44c3-8385-f8a4102c4dd1")
 	)
 	(wire
 		(pts
@@ -3835,7 +3723,7 @@
 		)
 	)
 	(symbol
-		(lib_id "carrier:DF40GB-30DP-0.4V_51_")
+		(lib_id "carrier:DF40TC-30DP-0.4V_51_")
 		(at 200.66 59.69 0)
 		(unit 1)
 		(body_style 1)
@@ -3855,7 +3743,7 @@
 				)
 			)
 		)
-		(property "Value" "DF40GB-30DP-0.4V(51)"
+		(property "Value" "DF40TC-30DP-0.4V(51)"
 			(at 200.66 36.83 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3865,7 +3753,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_Hirose_DF40:HIROSE_DF40GB-30DP-0.4V_51_"
+		(property "Footprint" "Connector_Hirose_DF40:HIROSE_DF40TC-30DP-0.4V_51_"
 			(at 200.66 59.69 0)
 			(hide yes)
 			(show_name no)
@@ -3985,18 +3873,6 @@
 		)
 		(pin "30"
 			(uuid "8fc6f5ce-26c8-4f42-bc94-37b2a909af04")
-		)
-		(pin "G1"
-			(uuid "2ed23156-e57d-44e2-a224-649cba9634fe")
-		)
-		(pin "G2"
-			(uuid "a6f99207-846f-4649-af89-527a1f7981a3")
-		)
-		(pin "G3"
-			(uuid "c699fb9a-4fbf-478b-bae5-6cc9018a0895")
-		)
-		(pin "G4"
-			(uuid "d8e854c2-e8f0-4bd4-a5e0-d5ca597bf651")
 		)
 		(instances
 			(project "carrier"
