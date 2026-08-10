@@ -88,7 +88,8 @@ EOF
 
 # ----------------------------------------------------------------- fixups
 step "Fixups"
-"$KICAD_PY" "$ROOT/tools/panel_fixups.py" "$OUT" 2>/dev/null
+"$KICAD_PY" "$ROOT/tools/panel_fixups.py" "$OUT" 2>/dev/null \
+	| grep -v "memory leak"
 
 # ------------------------------------------------------------------- verify
 step "Panel DRC"
@@ -124,13 +125,17 @@ step "Panel"
 python3 - "$OUT" <<'EOF'
 import re, sys
 t = open(sys.argv[1]).read()
+# Outline extent. Take every gr_line endpoint -- the only board-level gr_lines
+# kikit emits are the cuts, and filtering on the layer is brittle because the
+# (layer ...) token does not sit at a fixed offset from (start ...).
 xs, ys = [], []
-for m in re.finditer(r'\(gr_line\s+\(start ([-\d.]+) ([-\d.]+)\)\s*\(end ([-\d.]+) ([-\d.]+)\)[^)]*?\(layer "Edge.Cuts"\)', t, re.S):
+for m in re.finditer(r'\(gr_line\s+\(start ([-\d.]+) ([-\d.]+)\)\s*\(end ([-\d.]+) ([-\d.]+)\)', t):
 	xs += [float(m.group(1)), float(m.group(3))]
 	ys += [float(m.group(2)), float(m.group(4))]
 if xs:
-	print(f'{max(xs)-min(xs):.2f} x {max(ys)-min(ys):.2f} mm')
-print(f'{t.count(chr(34)+"BGA-67_6.5x8.0mm_Layout8x10_P0.8mm"+chr(34))} boards')
+	print('%.2f x %.2f mm' % (max(xs) - min(xs), max(ys) - min(ys)))
+print('%d boards' % t.count(':BGA-67_6.5x8.0mm_Layout8x10_P0.8mm"'))
+print('%d mouse bites' % t.count('(footprint "NPTH"'))
 EOF
 
 # ---------------------------------------------------------------------------
