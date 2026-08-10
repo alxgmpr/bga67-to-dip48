@@ -2,4 +2,6 @@
   (version 7)
 
   (lib (name "carrier") (type "KiCad") (uri "${KIPRJMOD}/../carrier/lib/carrier.kicad_sym") (options "") (descr ""))
+
+  (lib (name "base") (type "KiCad") (uri "${KIPRJMOD}/lib/base.kicad_sym") (options "") (descr ""))
 )

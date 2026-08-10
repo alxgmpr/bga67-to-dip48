@@ -31,7 +31,18 @@ pin 1 to pin 24) while the flash carrier wants to be small and replicated:
 
 - `carrier/` schematic is drawn and wired. U1 (flash) + J1 (connector) + power symbols.
   15 signal nets: `IO1`–`IO8`, `/CE`, `/WE`, `/RE`, `/WP`, `CLE`, `ALE`, `RY//BY`, plus
-  `VCC`/`GND`.
+  `VCC`/`GND`. ERC is clean. Netlist verified pin-for-pin against the ball map.
+
+  *This was broken until 2026-08-09.* The `lib_symbols` cache still keyed its entries under
+  the old `bga67-to-dip:` nickname while the instances referenced `carrier:`. KiCad could
+  not resolve the cached definitions, so U1 and J1 were placed with **no pins**: 85 ERC
+  violations, every label dangling, and the netlist collapsed to 2 nets with all 67 U1 pads
+  shorted together. If you ever rename a project library, grep the schematic for the old
+  nickname — a stale cache key fails silently and still opens.
+- `carrier/` PCB: nets imported, U1 fpid corrected, 4 copper layers on a JLCPCB 1.6 mm
+  stackup, GND pour on In2.Cu. DRC clean, 37 unconnected (nothing routed).
+- `base/` schematic is drawn and wired. ERC clean, 17 nets, cross-checked against both
+  tables in `connector-pinout.md`.
 - Custom parts, all built from the datasheet/catalog and cross-checked against source
   dimensions:
   - `carrier:TC58NVG1S3HBAI6` symbol, 67 pins
@@ -46,13 +57,22 @@ pin 1 to pin 24) while the flash carrier wants to be small and replicated:
 
 **Not done:**
 
-- `base/` is an empty scaffold. Needs schematic, DIP48 footprint, DF40 receptacle
-  symbol+footprint, layout.
 - `carrier/` PCB layout — nothing placed or routed.
-- `carrier.kicad_pcb` still needs **Update PCB from Schematic (F8)**; it carries a stale
-  `bga67-to-dip:` fpid for U1 and has no nets imported. F8 clears both.
-- Receptacle part not chosen. The plug is fixed; the **receptacle** sets stack height, e.g.
-  `DF40C(2.0)-30DS-0.4V(51)` for 2.0 mm.
+- `base/` PCB — 4 layers and net classes are set, but nothing imported or placed.
+- No 3D model on the DF40 30-pin plug or receptacle footprints. The STEP files under
+  `carrier/lib/` are the **48**-pin part, not the 30-pin one.
+- No decoupling caps in the `carrier/` schematic. The BOM below lists 2× 100 nF; they are
+  not drawn yet.
+
+## Stack height — settled, and not the way you would guess
+
+**1.5 mm.** The carrier's plug is `DF40GB-30DP-0.4V(51)`, and `GB` is the *shielded* DF40
+family. The catalog's shielded matrix offers 30 positions at 1.5 mm only; the sole mating
+receptacle is `DF40GB(1.5)-30DS-0.4V(51)` (HRS `CL0684-4198-4-51`, 30 signal + 4 ground).
+
+4.0 mm does not exist at 30 positions in *any* DF40 family — it starts at 50 positions.
+Unshielded DF40C/HC reach 3.5 mm at 30 positions, so if you need a bigger gap the carrier's
+plug has to be re-specified too. That is the only lever.
 
 ## Design rules (both projects, JLCPCB 4-layer 1 oz)
 
@@ -63,12 +83,17 @@ Default  track 0.15  clr 0.1  via 0.45/0.25
 Signal   track 0.15  clr 0.1  via 0.45/0.25
 Power    track 0.4   clr 0.1  via 0.6/0.3
 
-patterns: IO* -> Signal, VCC -> Power, GND -> Power
+patterns: /* -> Signal, VCC -> Power, GND -> Power
 ```
 
 Default deliberately carries the signal geometry so control nets need no pattern.
 KiCad netclass patterns are `*`/`?` wildcards only — **no regex alternation**, `VCC|GND`
 matches nothing.
+
+The pattern is `/*`, not `IO*`. Root-sheet local labels get a sheet-path prefix, so the
+signal nets are named `/IO1`, `/{slash}CE`, `/RY{slash}{slash}BY`. `IO*` matched nothing and
+every signal net fell through to Default. Verified: all 15 now resolve to Signal, VCC/GND
+to Power.
 
 **Clearance is 0.1 mm, not 0.15, for a reason.** At 0.15 the ball field is unroutable:
 
@@ -104,9 +129,12 @@ JLCPCB, **4 layers**, ENIG. L2 must be a solid ground pour spanning the ball fie
 
 ## Hard constraints
 
-- **Carrier bottom side must stay clear.** Clearance to board B. All passives go top side,
-  outside the BGA outline. There are 2.5 mm strips either side of the BGA courtyard and
-  2.75 mm at each end — enough for the two 0402s.
+- **F.Cu is the carrier's mating face.** J1 (the plug) is on F.Cu and faces board B. U1 and
+  the passives go on **B.Cu**, the outward face, where they have unlimited headroom — the
+  VFBGA67 is 1.00 mm max tall, so it would physically fit in a 1.5 mm gap, but it does not
+  live there. B.Cu therefore carries the parts; nothing but the connector sits on F.Cu.
+  There are 2.5 mm strips either side of the BGA courtyard and 2.75 mm at each end (courtyard
+  8.5 × 7.0 on a 14 × 12 board, i.e. U1 rotated 90°) — enough for the two 0402s.
 - **The 47 NC balls float.** Do not tie them to ground.
 - **Do not permute the data bus.** Commands and addresses travel over the same I/O pins;
   a swizzle corrupts the command byte, it does not merely scramble a dump.
