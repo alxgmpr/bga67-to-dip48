@@ -13,7 +13,7 @@ pin 1 to pin 24) while the flash carrier wants to be small and replicated:
 
 | | dir | contents | size |
 |---|---|---|---|
-| A | `carrier/` | TC58NVG1S3HBAI6 (VFBGA-67) + DF40 30-pin plug + 2× 100 nF | ~12 × 14 mm |
+| A | `carrier/` | TC58NVG1S3HBAI6 (VFBGA-67) + DF40 30-pin plug | 9.25 × 7.45 mm |
 | B | `base/` | DIP48 pin field + DF40 30-pin receptacle + pull-ups + bulk | ~63 × 20 mm |
 
 ## Working preferences
@@ -166,8 +166,16 @@ JLCPCB, **4 layers**, ENIG. L2 must be a solid ground pour spanning the ball fie
 
 - U1 — TC58NVG1S3HBAI6
 - J1 — DF40GB-30DP-0.4V(51)
-- 2× 100 nF 0402, top side, near VCC balls G7 (+2.0, +1.2) and H5 (+0.4, +2.0);
-  GND ball J7 is at (+2.0, +2.8), so a cap around x ≈ +2.0, y ≈ +4.6 reaches all three
+- **No decoupling on the carrier.** Worked the numbers rather than assuming: worst case is
+  8 I/O switching into 30 pF with 5 ns edges — 158 mA through 5.45 nH — which is 173 mV,
+  5.2% of 3.3 V against a 660 mV budget to VIH. At the 20–50 ns edges a programmer actually
+  produces it is 2–11 mV. The datasheet specifies no bypass cap; DC is 30 mA max over two
+  DF40 contacts rated 0.5 A each; program/erase draw that over milliseconds with no di/dt.
+  The largest inductance term is the carrier's own J1-to-ball trace, which a local cap only
+  partly shortens.
+  **Decoupling lives on board B: 100 nF within ~2 mm of the receptacle's VCC pins.**
+  If dumps ever come back flaky, adding a carrier cap is the first thing to try — it needs
+  ~2.6 mm more board width.
 
 Pull-ups (`RY//BY` 10 k, `/WP` 10 k) and the 1 µF bulk were moved to board B — they are
 static or low-frequency and board B has the space.

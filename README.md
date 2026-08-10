@@ -5,7 +5,7 @@ flash carrier can be swapped without rebuilding the DIP48 field.
 
 | | Board | Contents | Size |
 |---|---|---|---|
-| A | `carrier/` | KIOXIA TC58NVG1S3HBAI6 (VFBGA-67) + DF40 30-pin plug + 2× 100 nF | ~12 × 14 mm |
+| A | `carrier/` | KIOXIA TC58NVG1S3HBAI6 (VFBGA-67) + DF40 30-pin plug | 9.25 × 7.45 mm |
 | B | `base/` | DIP48 socket + DF40 30-pin receptacle + pull-ups + bulk | ~63 × 20 mm |
 
 The DIP48 span is fixed by the socket — 23 × 2.54 = 58.42 mm from pin 1 to pin 24 — which is
@@ -46,6 +46,29 @@ not worth the trouble. No paste on the BGA footprint (chips get reballed with le
 Design rules are identical in both projects. Net classes bind via pattern `/*` → Signal and
 `VCC`/`GND` → Power; the leading slash matters, because root-sheet local labels land on the
 board as `/IO1` rather than `IO1`.
+
+## Panel
+
+`panel/carrier-panel.kicad_pcb` is a 4×4 mouse-bite panel, 52.9 × 45.7 mm, generated with
+KiKit from the single board:
+
+```bash
+kikit panelize --layout 'grid; rows: 4; cols: 4; space: 2mm' \
+  --tabs 'fixed; width: 3mm; vcount: 2; hcount: 1' \
+  --cuts 'mousebites; drill: 0.45mm; spacing: 0.9mm; offset: -0.3mm; prolong: 0.5mm' \
+  --framing 'frame; width: 3mm; space: 2mm; cuts: both' \
+  --tooling '4hole; hoffset: 1.5mm; voffset: 1.5mm; size: 1.5mm' \
+  --post 'millradius: 1mm' carrier/carrier.kicad_pcb panel/carrier-panel.kicad_pcb
+```
+
+The **negative** mouse-bite offset matters. At the default the bites sit inside the board
+edge and land 0.17 mm from signal copper, below JLCPCB's 0.2 mm hole-to-track minimum; at
+−0.3 mm they sit in the waste and DRC is clean. Regenerating the panel also leaves 64
+co-located drills at tab junctions that need deduping — see the commit history.
+
+Panel DRC is clean apart from silkscreen-over-copper warnings where refdes text meets the
+bites, which are cosmetic. Rails give you something to hold while reflowing the BGA and
+hand-soldering a 0.4 mm-pitch connector.
 
 ## State
 
