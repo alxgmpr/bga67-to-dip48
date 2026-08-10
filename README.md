@@ -49,26 +49,29 @@ board as `/IO1` rather than `IO1`.
 
 ## Panel
 
-`panel/carrier-panel.kicad_pcb` is a 4×4 mouse-bite panel, 52.9 × 45.7 mm, generated with
-KiKit from the single board:
+`panel/carrier-panel.kicad_pcb` is a 4×4 mouse-bite panel, 52.9 × 45.7 mm, generated from
+the single board. **Everything under `panel/` except `fp-lib-table` is disposable output.**
+Close KiCad, then:
 
 ```bash
-kikit panelize --layout 'grid; rows: 4; cols: 4; space: 2mm' \
-  --tabs 'fixed; width: 3mm; vcount: 2; hcount: 1' \
-  --cuts 'mousebites; drill: 0.45mm; spacing: 0.9mm; offset: -0.3mm; prolong: 0.5mm' \
-  --framing 'frame; width: 3mm; space: 2mm; cuts: both' \
-  --tooling '4hole; hoffset: 1.5mm; voffset: 1.5mm; size: 1.5mm' \
-  --post 'millradius: 1mm' carrier/carrier.kicad_pcb panel/carrier-panel.kicad_pcb
+make panel
 ```
 
-The **negative** mouse-bite offset matters. At the default the bites sit inside the board
-edge and land 0.17 mm from signal copper, below JLCPCB's 0.2 mm hole-to-track minimum; at
-−0.3 mm they sit in the waste and DRC is clean. Regenerating the panel also leaves 64
-co-located drills at tab junctions that need deduping — see the commit history.
+That runs [`tools/panelize.sh`](tools/panelize.sh), which is the only place the recipe
+lives — the parameters are named variables at the top of the script. It refuses to run
+while KiCad holds a lock (otherwise you panelize a stale carrier), DRCs the source board
+first, regenerates `panel/fp-lib-table` so a fresh clone resolves footprints, dedupes the
+co-located mouse-bite drills KiKit leaves at every tab junction, then DRCs the result and
+prints the panel size and board count. Non-zero exit means something needs looking at.
 
-Panel DRC is clean apart from silkscreen-over-copper warnings where refdes text meets the
-bites, which are cosmetic. Rails give you something to hold while reflowing the BGA and
-hand-soldering a 0.4 mm-pitch connector.
+Do not hand-edit the panel and do not paste a modified `kikit` command into a shell — edit
+the script. The **negative** mouse-bite offset in particular is load-bearing and the script
+says why.
+
+Rails give you something to hold while reflowing the BGA and hand-soldering a 0.4 mm-pitch
+connector.
+
+`make check` runs ERC and DRC over both projects and validates `tools/pinout.py`.
 
 ## State
 

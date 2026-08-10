@@ -1,0 +1,100 @@
+(version 1)
+
+# JLCPCB 4-layer FR-4, 1 oz outer / 0.5 oz inner, ENIG.
+#
+# Source: "Rigid PCB Manufacturing Capabilities", jlcpcb.com, retrieved
+# 2026-08-09.  Section names in the comments below match the headings on that
+# page.  Every number here is quoted, not guessed -- if you change one, cite
+# the row it came from.
+#
+# Installed into each project as <project>.kicad_dru by tools/drc-rules.py.
+# Edit tools/jlc-4layer.kicad_dru, never the copies.
+#
+# The plain numeric limits (min track, min clearance, edge clearance, annular
+# ring, text size ...) live in each .kicad_pro because KiCad has first-class
+# settings for them.  This file carries only the constraints that need a
+# condition -- the ones KiCad cannot express as a single global number.
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
+(rule "JLC SMD pad to SMD pad 0.15mm"
+	(constraint clearance (min 0.15mm))
+	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
+
+# "Via hole to Track: 0.2mm"
+(rule "JLC via hole to track 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Type == 'Track'"))
+
+# "PTH to Track: 0.28mm" (0.35 mm recommended)
+(rule "JLC PTH hole to track 0.28mm"
+	(constraint hole_clearance (min 0.28mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Type == 'Track'"))
+
+# "NPTH to Track: 0.2mm"
+(rule "JLC NPTH hole to track 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical' && B.Type == 'Track'"))
+
+# "Inner layer via hole to copper clearance: 0.2mm"
+(rule "JLC inner-layer via hole to copper 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Layer == 'In1.Cu'"))
+
+(rule "JLC inner-layer via hole to copper 0.2mm (In2)"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Layer == 'In2.Cu'"))
+
+# "Inner layer PTH pad hole to copper clearance: 0.3mm"
+(rule "JLC inner-layer PTH hole to copper 0.3mm"
+	(constraint hole_clearance (min 0.3mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Layer == 'In1.Cu'"))
+
+(rule "JLC inner-layer PTH hole to copper 0.3mm (In2)"
+	(constraint hole_clearance (min 0.3mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Layer == 'In2.Cu'"))
+
+# ----------------------------------------------------------------- Drilling
+
+# "Pad Hole-to-Hole Spacing: 0.45mm".  Plated pads only -- mouse bites are
+# NPTH and JLC specifies them separately (see below), so scoping this to
+# 'Through-hole' keeps a panel from tripping a rule that does not apply to it.
+(rule "JLC PTH hole to PTH hole 0.45mm"
+	(constraint hole_to_hole (min 0.45mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Pad_Type == 'Through-hole'"))
+
+# "Via Hole-to-Hole Spacing: 0.2mm"
+(rule "JLC via hole to via hole 0.2mm"
+	(constraint hole_to_hole (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Type == 'Via'"))
+
+# "Min. Non-plated holes: 0.50mm".  Also the floor of the 0.5-0.8 mm range
+# JLC recommends for mouse bites, which is why tools/panelize.sh drills 0.5.
+(rule "JLC minimum NPTH 0.5mm"
+	(constraint hole_size (min 0.5mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical'"))
+
+# "Mouse bites Panel: recommended distance between the two mouse-bites is
+# 0.2-0.3mm."  NPTH-to-NPTH only; the 0.45 mm pad rule above does not apply.
+(rule "JLC mouse-bite hole spacing 0.2mm"
+	(constraint hole_to_hole (min 0.2mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical' && B.Pad_Type == 'NPTH, mechanical'"))
+
+# "PTH annular ring: multilayer 1 oz recommended 0.20mm or above, absolute
+# minimum 0.15mm."  KiCad's global min_via_annular_width covers vias only.
+(rule "JLC PTH annular ring 0.15mm"
+	(constraint annular_width (min 0.15mm))
+	(condition "A.Pad_Type == 'Through-hole'"))
+
+# --------------------------------------------------------------------- Cost
+
+# Not a manufacturability limit.  "0.15mm hole size with any size via
+# diameter, and 0.2mm or 0.25mm hole size with via diameter less than
+# 0.45mm, will cost more."  Our vias are 0.45/0.20, exactly on the free
+# boundary -- this fires if anyone shrinks a via pad below it.
+(rule "JLC via below the free-tooling boundary (cost, not a defect)"
+	(severity warning)
+	(constraint via_diameter (min 0.45mm))
+	(condition "A.Type == 'Via'"))

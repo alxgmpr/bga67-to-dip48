@@ -78,11 +78,16 @@ receptacle is `DF40GB(1.5)-30DS-0.4V(51)` (HRS `CL0684-4198-4-51`, 30 signal + 4
 Unshielded DF40C/HC reach 3.5 mm at 30 positions, so if you need a bigger gap the carrier's
 plug has to be re-specified too. That is the only lever.
 
-## Design rules (both projects, JLCPCB 4-layer 1 oz)
+## Design rules
+
+**Moved to `docs/jlc-rules.md`, and they are now generated, not hand-set.**
+`tools/drc-rules.py` is the only writer -- run `make rules` after editing
+`tools/jlc-4layer.kicad_dru`, and `make check` to verify nothing drifted. Every value is
+quoted from JLCPCB's capabilities page with the section it came from.
+
+Netclasses (still per project, still hand-set):
 
 ```
-min track 0.09   min clearance 0.09   min via 0.3/0.2   min hole 0.2
-
 Default  track 0.15  clr 0.1  via 0.45/0.25
 Signal   track 0.15  clr 0.1  via 0.45/0.25
 Power    track 0.4   clr 0.1  via 0.6/0.3
@@ -91,7 +96,7 @@ patterns: /* -> Signal, VCC -> Power, GND -> Power
 ```
 
 Default deliberately carries the signal geometry so control nets need no pattern.
-KiCad netclass patterns are `*`/`?` wildcards only — **no regex alternation**, `VCC|GND`
+KiCad netclass patterns are `*`/`?` wildcards only -- **no regex alternation**, `VCC|GND`
 matches nothing.
 
 The pattern is `/*`, not `IO*`. Root-sheet local labels get a sheet-path prefix, so the
@@ -110,29 +115,29 @@ via 0.45 pad -> 0.1407 mm gap    fails 0.15, passes 0.1
 via 0.40 pad -> 0.1657 mm gap
 
 trace between adjacent pads (0.400 mm available):
-  0.15 trace + 2×0.15 clr = 0.450  fails
-  0.15 trace + 2×0.10 clr = 0.350  ok
+  0.15 trace + 2x0.15 clr = 0.450  fails
+  0.15 trace + 2x0.10 clr = 0.350  ok
 ```
 
-**Copper clearance is not what binds — hole clearance is.** The 0.45 mm via pad clears the
-ball pads by 0.1407 mm and passes the 0.1 mm rule, but `min_hole_clearance` is 0.25 mm and it
-is measured from the *drill*, not the pad:
+**Copper clearance is not what binds -- hole clearance is.** The escape was sized against
+a 0.25 mm hole clearance:
 
 ```
 via 0.45 / 0.25 drill -> 0.5657 - 0.125 - 0.200 = 0.2407 mm   fails 0.25
 via 0.45 / 0.20 drill -> 0.5657 - 0.100 - 0.200 = 0.2657 mm   passes
 ```
 
-A 0.25 mm drill throws 72 hole-clearance errors across the escape. The vias are **0.45 / 0.20**,
-which keeps a 0.125 mm annular ring, above the 0.1 mm minimum. Do not widen the drill back to
-the netclass default.
+JLC's actual inner-layer via-hole-to-copper limit turns out to be **0.20 mm**, so the
+board now has margin it did not have when it was routed. **Do not spend it by widening
+the drill.** 0.45/0.20 sits exactly on JLC's free-tooling boundary; a wider drill or a
+narrower pad both cost more. See `docs/jlc-rules.md`.
 
 Note also that netclass via/track defaults do not apply inside the ball field: Power wants a
 0.6 mm via and a 0.4 mm track, neither of which fits. Escape stubs are 0.15 mm and escape vias
 are 0.45/0.20 on every net including VCC and GND. Netclass values are defaults, not minima, so
 DRC is satisfied.
 
-A per-pad clearance override does **not** help — KiCad resolves clearance between two items
+A per-pad clearance override does **not** help -- KiCad resolves clearance between two items
 as the largest applicable value, so loosening one side changes nothing.
 
 ## Fab

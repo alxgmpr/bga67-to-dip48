@@ -1,31 +1,5 @@
-# KiCad backups and autosave
-*-backups/
+__pycache__/
+*.pyc
 *.kicad_prl
-*.kicad_sch-bak
-*.kicad_pcb-bak
-*.kicad_sch.bak
-*.bak
-~*.kicad_*
-_autosave-*
-*.lck
-fp-info-cache
-
-# Netlist / autoroute intermediates
-*.net
-*.dsn
-*.ses
-
-# Fabrication output (regenerate from source)
-gerbers/
-production/
-*.zip
-*.drl
-*.gbr
-
-# 3D models under lib/ ARE tracked - they are sources, not outputs.
-
-# OS
-.DS_Store
-
-# VS Code Local History extension
-.history/
+~*.lck
+panel/fabrication-toolkit-options.json

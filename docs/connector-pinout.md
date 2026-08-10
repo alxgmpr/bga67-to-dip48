@@ -130,6 +130,26 @@ ordering.
 
 The other 47 balls are NC. **Leave them floating — do not tie them to ground.**
 
+### Cross-checked against an independent source
+
+The table above was read off the Kioxia datasheet (p.2). It has since been confirmed
+pin-for-pin against courk's **NandBug** hardware, which targets the same part in the same
+Google Home Mini:
+
+- `interposer_board/schematics.pdf` rev 3.0, 07/05/2020
+- `daughter_board/schematics.pdf` rev 1.0, 23/05/2020
+- https://github.com/courk/Nandbug-Hardware
+
+All 20 used balls agree — IO1–IO8, the seven control lines, both VCC and all three VSS.
+Two independent sources on the one table that cannot be caught by ERC, DRC or a netlist
+diff, because both boards would be consistently wrong together.
+
+Nothing else from NandBug applies here. Its mezzanine is a 20-pin DF17 0.5 mm carrying
+15 signals, 2 VCC and only 3 GND, all bunched at pins 9/11/13 — no checkerboard, and seven
+IO lines in a row with no adjacent return. Its interposer also uses a **mirrored** BGA
+footprint, because it solders into the Home Mini in place of the flash rather than
+carrying a chip. The repo ships Gerbers and a schematic PDF only, no CAD source.
+
 ## DIP48 side (base board)
 
 Board B presents a **48-pin DIP socket** (female), 2.54 mm pitch, 0.6″ / 15.24 mm row
