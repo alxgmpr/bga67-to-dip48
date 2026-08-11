@@ -2,7 +2,7 @@ KICAD_CLI ?= /Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli
 
 KICAD_PY ?= /Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python
 
-.PHONY: help panel check pinout rules route-base clean
+.PHONY: help panel check pinout rules route-base ringout clean
 
 help:
 	@echo "make rules    push the JLCPCB 4-layer rule set into every project"
@@ -10,6 +10,8 @@ help:
 	@echo "make route-base  finish base/ routing (additive; keeps F.Cu/B.Cu work)"
 	@echo "make check    rules in sync, pinout, then ERC+DRC on both projects"
 	@echo "make pinout   verify tools/pinout.py invariants"
+	@echo "make ringout  check the recorded XGecu adapter ring-out"
+	@echo "              (no args: print the probe checklist)"
 
 rules:
 	@./tools/drc-rules.py
@@ -22,6 +24,10 @@ route-base:
 
 pinout:
 	@python3 tools/pinout.py && echo "pinout ok"
+
+# Not part of `check`: it needs readings a human took with a meter.
+ringout:
+	@python3 tools/ringout.py docs/ringout-results.txt
 
 check: pinout
 	@./tools/drc-rules.py --check

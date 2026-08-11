@@ -104,8 +104,15 @@ but check they are still there afterwards:
   raising its round count made things worse rather than better.
 
 **The TSOP48 pinout is unverified.** It comes from the JEDEC standard, not from the Kioxia
-datasheet, which documents only the BGA. Ring it out against the physical XGecu adapter
-before ordering board B.
+datasheet, which documents only the BGA. It is the one claim in this repo that no amount of
+checking in software can reach — both boards would be consistently wrong together.
+
+```bash
+python3 tools/ringout.py
+```
+
+prints the probe checklist; record the readings in `docs/ringout-results.txt` and run
+`make ringout`.
 
 **The DF40TC plug's end pads are unverified.** The DF40T catalog's plug land drawing
 carries 0.475 and 0.35 dimensions at each end that could be hold-down pads, but `TC` means

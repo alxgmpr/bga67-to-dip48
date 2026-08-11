@@ -89,7 +89,11 @@ pad. Worth remembering if fragments reappear after a re-pour.
 - No 3D model on the DF40 30-pin plug or receptacle footprints. The STEP files under
   `carrier/lib/` are the **48**-pin part, not the 30-pin one, and both are now the
   superseded DF40GB shape anyway.
-- TSOP48 pinout still unverified against the physical XGecu adapter.
+- TSOP48 pinout still unverified against the physical XGecu adapter. `tools/ringout.py`
+  prints the probe checklist and checks the readings; record them in
+  `docs/ringout-results.txt` and run `make ringout`. Deliberately not part of `make check`,
+  because it needs a human with a meter. Also still open from that same bench session: the
+  socket's row spacing, and where its pin 1 sits relative to the lever.
 - The DF40TC plug's end pads are unverified — see "Unverified" below.
 - **Nothing checks that the XGecu adapter's body clears the base board.** The DIP48 field
   is surface mount now, so the adapter seats ~3 mm lower than it would have.

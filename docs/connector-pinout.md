@@ -225,8 +225,15 @@ the socket's I/O0.
 | VSS | 13, 36 |
 
 **Unverified.** This comes from the JEDEC standard, not from the Kioxia datasheet, which
-documents only the BGA. Ring it out against the actual XGecu adapter before committing the
-base board layout.
+documents only the BGA. Ring it out against the actual XGecu adapter before ordering board
+B — nothing in software can catch it being wrong, because both boards would be
+consistently wrong together and ERC, DRC and a netlist diff would all pass.
+
+`tools/ringout.py` drives this. Run it with no arguments for the probe checklist (19 used
+pins, each with the neighbours that must stay open), record the readings in
+`docs/ringout-results.txt`, then `make ringout`. It names the failure mode rather than
+just diffing: a uniform offset or a mirror is a one-line table fix, whereas an irregular
+mapping that touches the data bus means board B has to be rerouted before it is ordered.
 
 Only ~21 of the 48 positions need pins populated (the 17 nets plus corner pins for
 retention), but the board must still span pin 1 to pin 24: 23 × 2.54 = 58.42 mm.

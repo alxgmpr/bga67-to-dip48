@@ -1,0 +1,29 @@
+# XGecu T76_B48(63)_08-005 -- TSOP48 <-> DIP48 ring-out
+#
+# Replace each ? with the TSOP48 contact that rang when probed against that
+# DIP48 pin. Use - if nothing rang. Then:  make ringout
+#
+# meter:
+# date:
+# adapter markings:
+#
+# DIP  measured TSOP contact        signal
+7     ?                       # RY//BY
+8     ?                       # /RE
+9     ?                       # /CE
+12    ?                       # VCC
+13    ?                       # GND
+16    ?                       # CLE
+17    ?                       # ALE
+18    ?                       # /WE
+19    ?                       # /WP
+29    ?                       # IO1
+30    ?                       # IO2
+31    ?                       # IO3
+32    ?                       # IO4
+36    ?                       # GND
+37    ?                       # VCC
+41    ?                       # IO5
+42    ?                       # IO6
+43    ?                       # IO7
+44    ?                       # IO8
