@@ -63,22 +63,26 @@ pin 1 to pin 24) while the flash carrier wants to be small and replicated:
 
 - `panel/carrier-panel.kicad_pcb` — 4×4 mouse-bite panel, 56.80 × 49.60 mm, 16 up.
 
-- `base/` PCB is placed and routed: **0 DRC violations, 6 unconnected**. Run
+- `base/` PCB is placed and routed: **0 DRC violations, 3 unconnected**. Run
   `make route-base` to rebuild the vias and inner-layer routing; it is additive and
   re-runnable, and it now also lays the SMD field's landing stubs and vias.
+- Every connector pad is connected. All 19 used J2 pads have a track endpoint on the pad
+  centre; J1's 13 unlanded pads are exactly the checkerboard's GND pins, which take the
+  pour by design.
+- **`J1.6` (VCC) is hand-routed and the router cannot reproduce it.** It escapes *inward*
+  on B.Cu — a 0.5 mm stub from (125.14, 89.103) into the channel between the connector
+  rows. `escape_and_route` rejects both directions for this pad: outward, IO5's and IO7's
+  routes pass 0.4 mm away, which is exactly the via clearance limit, so no via will fit;
+  inward, its stub check fails. Since `strip()` preserves F.Cu and B.Cu, a `make
+  route-base` rerun leaves this route alone — but verify it is still there afterwards.
 
 **Not done:**
 
-- `base/` `J1.6` (VCC) is unrouted. It is one of the connector's two VCC contacts and it
-  is walled in on B.Cu: IO5's and IO7's hand routes pass 0.4 mm away, which is exactly the
-  via clearance limit, so there is neither a via position nor a corridor. VCC reaches the
-  flash through `J1.10`; pin 6 is still tied to VCC on the carrier, so it sits at VCC
-  potential and still serves as the checkerboard's AC-ground separator. Freeing it
-  properly means re-routing IO5/IO7 by hand.
-- 5 detached GND pour fragments on `base/` — F.Cu slivers trapped between the 48 SMD pads
+- 3 detached GND pour fragments on `base/` — F.Cu slivers trapped between the 48 SMD pads
   and the 19 landing stubs. `tie_fragments` cannot reach them and raising
   `ZONE_MIN_THICKNESS` is not available, because the pour has to reach a 0.4 mm-pitch
-  connector. More tie rounds made it worse, not better.
+  connector. More tie rounds made it worse, not better. This is the only reason
+  `make check` reports `base drc FAIL`.
 - No 3D model on the DF40 30-pin plug or receptacle footprints. The STEP files under
   `carrier/lib/` are the **48**-pin part, not the 30-pin one, and both are now the
   superseded DF40GB shape anyway.
