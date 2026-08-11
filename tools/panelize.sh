@@ -55,12 +55,21 @@ fi
 [ -x "$KICAD_CLI" ]  || die "kicad-cli not at $KICAD_CLI (override with KICAD_CLI=)"
 command -v kikit >/dev/null || die "kikit not on PATH"
 
-# ------------------------------------------------------------ source is clean
+# ---------------------------------------------------------- source is panel-safe
 step "Checking the source board"
-"$KICAD_CLI" pcb drc --exit-code-violations --severity-error \
-	-o /tmp/carrier-drc.json --format json "$SRC" >/dev/null 2>&1 \
-	|| die "carrier DRC is not clean -- fix the board before panelizing"
-echo "carrier DRC clean"
+"$KICAD_CLI" pcb drc --severity-error \
+	-o /tmp/carrier-drc.json --format json "$SRC" >/dev/null 2>&1
+python3 - <<'EOF'
+import json, sys
+d = json.load(open('/tmp/carrier-drc.json'))
+v = d.get('violations', [])
+u = len(d.get('unconnected_items', []))
+if v:
+	for item in v:
+		print('%s: %s' % (item.get('type', 'violation'), item.get('description', '')))
+	sys.exit(1)
+print('carrier has no DRC errors (%d unrouted connections expected)' % u)
+EOF
 
 # ----------------------------------------------------------------- panelize
 step "Panelizing ${ROWS}x${COLS}"
@@ -108,6 +117,7 @@ u = len(d.get('unconnected_items', []))
 #   lib_footprint_mismatch  kikit rewrites footprints into the panel by value
 #   silk_*, text_*          inherited from the carrier, cosmetic, and the
 #                           carrier's own DRC already reports them once each
+#   unconnected_items       the carrier is intentionally handed off unrouted
 #                           instead of sixteen times
 SOFT = ('lib_footprint_mismatch', 'silk_overlap', 'silk_edge_clearance',
         'silk_over_copper', 'text_height', 'text_thickness')
@@ -118,7 +128,7 @@ print('hard: %s' % (', '.join('%d %s' % (n, t) for t, n in sorted(hard.items()))
 print('soft: %s' % (', '.join('%d %s' % (n, t) for t, n in sorted(soft.items())) or 'none'))
 if u:
 	print('%5d unconnected' % u)
-sys.exit(1 if hard or u else 0)
+sys.exit(1 if hard else 0)
 EOF
 
 step "Panel"
@@ -134,7 +144,7 @@ for m in re.finditer(r'\(gr_line\s+\(start ([-\d.]+) ([-\d.]+)\)\s*\(end ([-\d.]
 	ys += [float(m.group(2)), float(m.group(4))]
 if xs:
 	print('%.2f x %.2f mm' % (max(xs) - min(xs), max(ys) - min(ys)))
-print('%d boards' % t.count(':BGA-67_6.5x8.0mm_Layout8x10_P0.8mm"'))
+print('%d boards' % t.count('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer"'))
 print('%d mouse bites' % t.count('(footprint "NPTH"'))
 EOF
 
@@ -142,7 +152,7 @@ EOF
 # Why MB_OFFSET is negative
 #
 # kikit's default offset puts the mouse-bite holes inside the board edge. On a
-# 9.25 x 7.45 mm carrier that lands them 0.17 mm from signal copper, under
+# compact carrier that lands them 0.17 mm from signal copper, under
 # JLCPCB's 0.2 mm hole-to-track minimum -- 812 violations. At -0.3 mm the bites
 # sit in the waste and DRC is clean. Do not "fix" the sign.
 # ---------------------------------------------------------------------------

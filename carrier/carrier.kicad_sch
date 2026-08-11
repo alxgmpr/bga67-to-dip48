@@ -5,7 +5,7 @@
 	(uuid "ec760498-00f3-4803-89f7-9f1b519363f1")
 	(paper "A4")
 	(title_block
-		(title "VFBGA67 to DF40 Mezzanine")
+		(title "Google Home VFBGA67 Chipless Interposer")
 		(date "2026-08-09")
 		(rev "B")
 		(company "Alex Gompper")
@@ -4059,7 +4059,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "TC58NVG1S3HBAI6"
+		(property "Value" "HOME_VFBGA67_INTERFACE"
 			(at 88.5033 49.53 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4070,7 +4070,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm"
+		(property "Footprint" "carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer"
 			(at 63.5 54.61 0)
 			(hide yes)
 			(show_name no)
@@ -4091,7 +4091,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "Logical pin-map interface for the chipless mirrored VFBGA67 land field soldered to the Google Home motherboard; not a populated NAND."
 			(at 63.5 54.61 0)
 			(show_name no)
 			(do_not_autoplace no)

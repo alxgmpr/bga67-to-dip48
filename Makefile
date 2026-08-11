@@ -2,12 +2,11 @@ KICAD_CLI ?= /Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli
 
 KICAD_PY ?= /Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python
 
-.PHONY: help panel check pinout rules route-base ringout clean
+.PHONY: help panel check pinout rules ringout clean
 
 help:
 	@echo "make rules    push the JLCPCB 4-layer rule set into every project"
 	@echo "make panel    rebuild panel/ from carrier/ (close KiCad first)"
-	@echo "make route-base  finish base/ routing (additive; keeps F.Cu/B.Cu work)"
 	@echo "make check    rules in sync, pinout, then ERC+DRC on both projects"
 	@echo "make pinout   verify tools/pinout.py invariants"
 	@echo "make ringout  check the recorded XGecu adapter ring-out"
@@ -19,9 +18,6 @@ rules:
 panel:
 	@./tools/panelize.sh
 
-route-base:
-	@$(KICAD_PY) tools/route_base.py 2>/dev/null | grep -v 'memory leak'
-
 pinout:
 	@python3 tools/pinout.py && echo "pinout ok"
 
@@ -30,6 +26,7 @@ ringout:
 	@python3 tools/ringout.py docs/ringout-results.txt
 
 check: pinout
+	@$(KICAD_PY) tools/check_interposer.py 2>/dev/null
 	@./tools/drc-rules.py --check
 	@for p in carrier base; do \
 		printf '%-8s erc  ' $$p; \

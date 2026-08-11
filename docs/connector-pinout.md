@@ -1,271 +1,79 @@
-# Mezzanine connector pinout
+# Mezzanine connector contract
 
-**Single source of truth.** `carrier` and `base` are separate KiCad projects, so nothing
-cross-checks them. Any change here must be applied to both boards in the same commit.
+The NAND remains in the XGecu adapter. Board A is a permanent chipless interposer; board B
+receives the removable adapter's DIP48 pins. The DF40 pair is normally left mated.
 
-- Carrier (board A): `DF40TC-30DP-0.4V(51)` plug, HRS `CL0684-4263-0-51`
-- Base (board B): `DF40TC(4.0)-30DS-0.4V(51)` receptacle, HRS `CL0684-4256-0-51`
+- Carrier: `DF40TC-30DP-0.4V(51)` plug
+- Base: `DF40TC(4.0)-30DS-0.4V(51)` receptacle
+- Pitch: 0.4 mm; mated height: 4.0 mm
 
-**Stack height is 4.0 mm.** Getting there meant leaving the shielded `DF40GB` family,
-which offers 30 positions at 1.5 mm only. Plain `DF40C`/`DF40HC` stop at 3.5 mm at 30
-positions. **`DF40T` (125 °C, automotive) does 30 positions at 4.0 mm and it is mass
-production** — see the DF40T/DF40GT catalog (Jan 2026) p.2 variation matrix and the p.8
-combinations table. 4.5–7.0 mm at 30 positions is still Under Planning, so 4.0 mm is the
-ceiling for this pin count in any DF40 family.
+The plug footprint also has four non-electrical corner contacts, `MT1`-`MT4`. They are
+0.35 x 0.66 mm retention lands at x = +/-3.275 mm and y = +/-1.355 mm. They are soldered
+for mechanical strength but are not connector positions and carry no net. The verified STEP
+model uses MT1 as its origin, so its KiCad transform is offset `(-3.275, -1.355, 0)`, with
+unit scale and zero rotation.
 
-**The plug carries no stacking height in its part number.** One `DF40TC-30DP-0.4V(51)`
-serves every height from 1.5 to 4.0 mm; the receptacle sets the gap. If the stack height
-ever changes again, only board B's part number moves.
+## Courk-ordered DF40 mapping
 
-What the DF40T family costs, relative to the DF40GB pair it replaced:
+Pins 7–26 reproduce Courk's ten NandBug DF17 pin pairs in the same order. The five surplus
+DF40 pair-columns are ground returns. This replaces the former checkerboard assignment and
+is the mapping that both PCBs must use.
 
-| | DF40GB (was) | DF40TC (now) |
-|---|---|---|
-| Stack height, 30 pos | 1.5 mm only | 1.5 / 2.0 / 2.5 / 3.0 / 3.5 / **4.0** mm |
-| Rated current | 0.5 A | 0.3 A (flash draws 30 mA) |
-| Mating durability | 30 cycles | **10 cycles** |
-| Shield | yes | no |
-| Retention tabs | G1–G4 | **none** |
+| Pair | Odd pin | Even pin |
+|---:|---|---|
+| 1 | 1 GND | 2 GND |
+| 2 | 3 GND | 4 GND |
+| 3 | 5 GND | 6 GND |
+| 4 | 7 RY//BY | 8 ALE |
+| 5 | 9 /WE | 10 /WP |
+| 6 | 11 /CE | 12 /RE |
+| 7 | 13 CLE | 14 VCC |
+| 8 | 15 GND | 16 GND |
+| 9 | 17 GND | 18 IO5 |
+| 10 | 19 GND | 20 IO2 |
+| 11 | 21 IO6 | 22 IO1 |
+| 12 | 23 IO8 | 24 IO3 |
+| 13 | 25 IO7 | 26 IO4 |
+| 14 | 27 GND | 28 GND |
+| 15 | 29 GND | 30 GND |
 
-The 10-cycle rating sharpens a rule that was already in this document: the repeatedly
-separated joint is the DIP48/ZIF end, not the mezzanine.
+`tools/pinout.py` is the machine-readable source of truth. A pinout change is atomic: update
+carrier PCB/schematic, base PCB/schematic, this table, and the checker together.
 
-Receptacle land pattern (catalog p.12, "Recommended PCB Pattern" &lt;30 pos.&gt;):
+The boards mate face-to-face, so the base receptacle footprint mirrors the plug's X axis.
+Pin 1 must meet pin 1 in the mated 3D/mechanical check.
 
-```
-signal  0.2 x 0.70  at y = +-1.54, x = -2.8 .. +2.8 step 0.4   (pitch 0.4, span 5.6)
-body    8.6 x 3.38, 3.90 above board
-```
+## NAND mapping
 
-There are no ground/retention pads: `TC` means no retention tab. The signal geometry is
-byte-for-byte what the DF40GB pair used — DF40 catalog p.10 gives the No-Retention-Tab
-receptacle pattern as rows 3.78 outer / 2.38 inner (so 0.70 long at y = ±1.54) and
-0.2 wide, and DF40T catalog p.9 gives the plug as rows 3.37/2.05 (0.66 long at
-y = ±1.355) and 0.23 wide, both at P=0.4 and B=5.60. **Every one of the 30 signal pads is
-unmoved on both boards**; only G1–G4 disappeared. That is why raising the stack height
-cost no re-routing.
+| Signal | VFBGA67 ball | TSOP48/DIP pin |
+|---|---:|---:|
+| IO1 | G3 | 29 |
+| IO2 | H3 | 30 |
+| IO3 | J3 | 31 |
+| IO4 | J4 | 32 |
+| IO5 | J5 | 41 |
+| IO6 | H6 | 42 |
+| IO7 | J6 | 43 |
+| IO8 | H7 | 44 |
+| RY//BY | B7 | 7 |
+| /RE | C3 | 8 |
+| /CE | B5 | 9 |
+| CLE | C4 | 16 |
+| ALE | B3 | 17 |
+| /WE | B6 | 18 |
+| /WP | B2 | 19 |
+| VCC | G7, H5 | 12, 37 |
+| GND | B4, J2, J7 | 13, 36 |
 
-The receptacle footprint is **mirrored in X** relative to the plug — pin 1 sits at +X —
-because the boards mate face to face. See "Mirror check" below.
+IO1–IO8 must remain end-to-end identical. NAND commands and addresses use this same bus, so
+a data-line permutation is not a harmless byte shuffle. The other 47 VFBGA67 lands are NC
+and must float.
 
-Pins 1/2 are a facing pair at one end; odd pins are one row, even the other, 0.4 mm pitch.
-Layout is a checkerboard: no signal is ever adjacent to or directly opposite another signal.
-Separators are GND except at pins 6 and 10, where VCC does the job — acceptable because VCC
-is an AC ground given the decoupling on board B. The two rows are offset by 0.4 mm, so odd-row
-signals sit opposite even-row separators and vice versa.
+The VFBGA map was checked against the Kioxia device documentation and Courk's NandBug rev-3
+hardware: https://github.com/courk/Nandbug-Hardware
 
-| x pos | Odd row | Even row |
-|------:|---------|----------|
-|  1 | **1** IO4 | 2 GND |
-|  2 | 3 GND | **4** IO7 |
-|  3 | **5** IO3 | 6 VCC |
-|  4 | 7 GND | **8** IO5 |
-|  5 | **9** IO2 | 10 VCC |
-|  6 | 11 GND | **12** IO8 |
-|  7 | **13** IO1 | 14 GND |
-|  8 | 15 GND | **16** IO6 |
-|  9 | **17** CLE | 18 GND |
-| 10 | 19 GND | **20** RY//BY |
-| 11 | **21** /RE | 22 GND |
-| 12 | 23 GND | **24** /WE |
-| 13 | **25** ALE | 26 GND |
-| 14 | 27 GND | **28** /CE |
-| 15 | **29** /WP | 30 GND |
+## Manufacturing topology
 
-**This assignment is derived from the flash's ball geometry, not chosen by hand.** The
-VFBGA67's used balls fall into two clusters: columns 2–4 (upper half) carry IO1–IO4 and
-the four control lines CLE/RE/ALE/WP, and columns 5–7 (lower half) carry IO5–IO8, the
-remaining control lines and both VCC balls. That is exactly 8 and 7 signals — and J1's odd
-row has exactly 8 signal slots, its even row exactly 7. The split has zero slack, so the
-row assignment is forced. Within a row, pins are ordered by ball x, which makes the escape
-fan out monotonically and keeps the connector fanout crossing-free. VCC takes separator
-pins 6 and 10, whose x lines up with the VCC balls H5 and G7.
-
-Consequently **IO1–IO8 are not in pin order on the connector**, and that is deliberate. See
-"Do not permute the data bus" below — the rule is about the end-to-end mapping, not the
-connector pin order.
-
-G1–G4 are gone. `DF40TC` has no retention tabs, so both footprints drop those four pads
-and the schematics no longer tie them to GND. J1's ground return is unaffected: the
-checkerboard already puts 13 GND pins in the signal field.
-
-## Net names
-
-Use these exact strings on both boards — the net classes key off them.
-
-`IO1`–`IO8`, `/CE`, `/WE`, `/RE`, `/WP`, `CLE`, `ALE`, `RY//BY`, `VCC`, `GND`
-
-The pinout table above uses `nCE`-style names for readability; the actual nets carry the
-datasheet's slash form. KiCad escapes these as `{slash}CE` in the file format — that is
-normal, not corruption.
-
-### Net class patterns
-
-Both projects carry these patterns in `.kicad_pro` already:
-
-| pattern | net class |
-|---|---|
-| `/*` | Signal |
-| `VCC` | Power |
-| `GND` | Power |
-
-**Why `/*` and not `IO*`.** The 15 signal nets come from *local* labels on the root
-sheet, so KiCad prefixes them with the sheet path: they land on the board as `/IO1`,
-`/{slash}CE`, `/RY{slash}{slash}BY` and so on. A pattern of `IO*` matches none of them and
-every signal net silently falls through to Default. `VCC` and `GND` come from power
-symbols and global labels, which are global and stay unprefixed, so they match bare.
-
-Verified on the carrier: all 15 signal nets resolve to Signal (0.15 mm track), VCC and GND
-to Power (0.4 mm).
-
-## Do not permute the data bus
-
-Commands and addresses travel over the same I/O pins as data. Swapping IO lines does not
-merely byte-swizzle a dump — it corrupts the command byte and the device will not respond.
-
-**The rule is about the end-to-end mapping**: flash ball IO*n* must reach TSOP48 socket
-IO*n*. It says nothing about which J1 pin carries which net in between. Permuting the
-connector assignment is safe — and is what the table above does — provided both boards use
-the same table. `tools/pinout.py` holds the canonical table plus a checker that asserts the
-checkerboard invariant and the full net set; both schematics were generated from it. Run
-`python3 tools/pinout.py` after any edit.
-
-What would break the device is editing one board's J1 assignment without the other.
-
-## Mirror check
-
-The boards mate face to face, so the X axis flips. On `base`, viewed from the top, the
-receptacle's pin 1 must sit at the end that lands under the plug's pin 1 after the flip —
-the opposite end from where intuition puts it. Verify a mated pair in the 3D viewer before
-ordering.
-
-## Flash ball map (TC58NVG1S3HBAI6, VFBGA-67)
-
-| Signal | Ball | | Signal | Ball |
-|---|---|---|---|---|
-| IO1 | G3 | | nCE | B5 |
-| IO2 | H3 | | nWE | B6 |
-| IO3 | J3 | | nRE | C3 |
-| IO4 | J4 | | CLE | C4 |
-| IO5 | J5 | | ALE | B3 |
-| IO6 | H6 | | nWP | B2 |
-| IO7 | J6 | | RY_nBY | B7 |
-| IO8 | H7 | | VCC | G7, H5 |
-|     |    | | VSS | B4, J2, J7 |
-
-The other 47 balls are NC. **Leave them floating — do not tie them to ground.**
-
-### Cross-checked against an independent source
-
-The table above was read off the Kioxia datasheet (p.2). It has since been confirmed
-pin-for-pin against courk's **NandBug** hardware, which targets the same part in the same
-Google Home Mini:
-
-- `interposer_board/schematics.pdf` rev 3.0, 07/05/2020
-- `daughter_board/schematics.pdf` rev 1.0, 23/05/2020
-- https://github.com/courk/Nandbug-Hardware
-
-All 20 used balls agree — IO1–IO8, the seven control lines, both VCC and all three VSS.
-Two independent sources on the one table that cannot be caught by ERC, DRC or a netlist
-diff, because both boards would be consistently wrong together.
-
-Nothing else from NandBug applies here. Its mezzanine is a 20-pin DF17 0.5 mm carrying
-15 signals, 2 VCC and only 3 GND, all bunched at pins 9/11/13 — no checkerboard, and seven
-IO lines in a row with no adjacent return. Its interposer also uses a **mirrored** BGA
-footprint, because it solders into the Home Mini in place of the flash rather than
-carrying a chip. The repo ships Gerbers and a schematic PDF only, no CAD source.
-
-## DIP48 side (base board)
-
-Board B presents a **48-position DIP socket field built from two 1×24 surface-mount
-socket strips** (Samtec `SSM-124-L-SV` class), 2.54 mm pitch, 0.6″ / 15.24 mm row spacing,
-footprint `base:DIP-48_SocketStrip_SMD_W15.24mm_P2.54mm`. The XGecu adapter carries the
-male DIP48 pins and inserts into it from above. Both parts are viewed from the top, so the
-socket is **not** mirrored — unlike the DF40 pair.
-
-**It is surface mount, so nothing protrudes below the board** and the carrier mezzanine
-underneath is unobstructed. No one-piece SMT DIP48 at 0.6″ exists in distribution, which
-is why it is two strips rather than one part.
-
-The tails **stagger ±1.65 mm** either side of each row centreline, alternating, which is
-how SMT socket strips fit a 2.54 mm pitch. Consequences worth knowing:
-
-- All 48 pad **Y coordinates are unchanged** from the through-hole footprint, and the row
-  centrelines still sit 15.24 mm apart — that is what the adapter's pins seat on.
-- The inner pad edges leave a **10.04 mm channel** between the rows. The carrier is
-  7.45 mm wide, so it still clears, with ~1.3 mm either side.
-- SMD pads live on **F.Cu only**. Every net on this board arrives from B.Cu or an inner
-  layer, so each used pad gets a 0.15 mm F.Cu stub back to its row centreline and a
-  0.45/0.20 via there — placed by `tools/route_base.py`. The via sits exactly where the
-  through-hole pad centre used to be, so every existing route still lands where it always
-  did. The 1.4 mm gap between the staggered pad columns takes that via with 0.475 mm of
-  copper clearance, well over the 0.1 mm rule.
-- **48 SMT contacts now take the full DIP insertion force with no through-hole anchor.**
-  This is the highest-force and most-cycled joint on the board. If pads start lifting,
-  that is the reason, and mounting hardware is the fix.
-
-All 48 positions are drilled even though only 19 carry nets; populating the full socket is
-cheaper mechanically than a partial one and gives the adapter even support.
-
-Standard JEDEC TSOP48 x8 NAND. Note the numbering offset: the Kioxia datasheet's I/O1 is
-the socket's I/O0.
-
-| Signal | TSOP48 pin |
-|---|---|
-| IO1–IO4 (I/O0–3) | 29, 30, 31, 32 |
-| IO5–IO8 (I/O4–7) | 41, 42, 43, 44 |
-| RY_nBY | 7 |
-| nRE | 8 |
-| nCE | 9 |
-| CLE | 16 |
-| ALE | 17 |
-| nWE | 18 |
-| nWP | 19 |
-| VCC | 12, 37 |
-| VSS | 13, 36 |
-
-**Confirmed.** This was flagged for a long time as "JEDEC hearsay, ring it out" — that was
-too pessimistic. Three independent lines of evidence now agree, and none of them is a
-multimeter.
-
-1. **Two manufacturer datasheets.** The table was originally composed from Kioxia's
-   `TC58BVG1S3HTA00`, the TSOP-48 sibling of our die family (our own `TC58NVG1S3HBAI6`
-   datasheet documents only the BGA — 66 pages, no TSOP mention). It has since been
-   checked pin-for-pin against Samsung's `K9F2G08U0C` (2 Gb x8 NAND, 48-TSOP1, Rev 0.2
-   p.5), an unrelated vendor's part in the same package class. **All 19 used pins agree,
-   and so do all 29 NC pins.** A 48-pin table that matches another vendor's exactly,
-   including every no-connect, is the standard pinout.
-
-2. **A working 285 MB dump.** The image was read with this exact programmer and adapter,
-   Read ID `98 DA 90 15`, and it de-interleaves at 2048+128 with factory bad-block markers
-   landing exactly on OOB byte 0 of pages 0 and 1; its ECC was recovered, its YAFFS2
-   volumes parsed and its DTB came back byte-perfect. **None of that is reachable through
-   a permuted bus.** Commands and addresses ride the same I/O pins, so a single swapped
-   line corrupts the command byte and the device answers nothing at all. That result
-   exercises IO1–IO8, CLE, ALE, `/WE`, `/RE` and `/CE` — 13 of the 15 signals — plus VCC
-   and VSS, end to end through the real hardware.
-
-3. **The programmer's ZIF is TSOP-48 ordered by construction.** A bare TSOP-48 NAND drops
-   straight into the T76's 48-pin ZIF with no adapter at all. That is only possible if ZIF
-   pin N carries TSOP-48 signal N, which is the mapping board B has to match.
-
-**What the dump does not prove**, precisely: `/WP` and `RY//BY`. A read-only operation
-never exercises them — `/WP` only gates program and erase, and a programmer that cannot
-see `RY//BY` falls back to polling the status register over the bus, so a dead ready line
-still yields a correct dump. Both carry 10 k pull-ups on board B (`R1`, `R2`), which is the
-right hedge for exactly these two.
-
-So the signal assignment is settled. The residual risk is **orientation, not assignment**:
-which physical corner of the mating part is pin 1. On board B, `J2` pin 1 is at the
-top-left with pins 1–24 down the left column and 25–48 back up the right, silk dot
-outboard of pin 1, viewed from the top — see "Mirror check" above, and confirm against the
-adapter's own pin 1 before ordering.
-
-`tools/ringout.py` remains available if you want the measurement anyway: run it with no
-arguments for a probe checklist, record readings in `docs/ringout-results.txt`, then
-`make ringout`. It names the failure mode rather than just diffing, since a uniform offset
-or a mirror is a one-line table fix whereas an irregular mapping touching the data bus
-means board B is rerouted before it is ordered.
-
-Only ~21 of the 48 positions need pins populated (the 17 nets plus corner pins for
-retention), but the board must still span pin 1 to pin 24: 23 × 2.54 = 58.42 mm.
+The carrier escape is deliberately conventional: 0.15 mm tracks and 0.45/0.20 mm ordinary
+through-via dogbones. No BGA pad contains a via. There are no microvias, blind/buried vias,
+VIPPO, filled/capped vias, or other HDI requirements.
