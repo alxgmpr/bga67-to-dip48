@@ -83,22 +83,25 @@ Both schematics are drawn, wired and ERC-clean.
 **The carrier is finished** — placed, routed, 0 DRC violations, 0 unconnected — and
 panelized.
 
-**Board B is routed**: 0 DRC violations, 3 unconnected items — all three are detached GND
-pour fragments. Every pad on both connectors is connected: all 19 used J2 pads have copper
-landing on the pad centre, and J1's 13 unlanded pads are exactly the checkerboard's GND
-pins, which take the pour by design.
+**Board B is routed and clean**: 0 DRC violations, 0 unconnected. `make check` passes on
+both projects.
 
-The remaining 3 are slivers the pour cannot join. `ZONE_MIN_THICKNESS` is held at 0.15 mm
-because the pour has to reach a 0.4 mm-pitch connector, so they cannot simply be squeezed
-out, and raising `tie_fragments`' round count makes it worse rather than better. They are a
-pour-connectivity nit, not a short and not a missing connection — but they do make
-`make check` report `base drc FAIL`.
+Every pad is connected. All 19 used J2 pads have copper landing on the pad centre, and
+J1's 12 unlanded pads are exactly the checkerboard's GND pins that take the pour by
+design.
 
-`J1.6` (VCC) was the hard one and is now routed by hand: it escapes **inward** on B.Cu,
-into the channel between the connector rows. `tools/route_base.py` rejects that direction —
-going outward IO5's and IO7's routes pass 0.4 mm away, exactly the via limit, and going
-inward its stub check fails — so if you re-run `make route-base`, check that this route
-survives, because the router cannot recreate it.
+Two routes on `base/` are hand work that `tools/route_base.py` cannot reproduce. `strip()`
+only removes vias and inner-layer tracks, so a `make route-base` rerun preserves both —
+but check they are still there afterwards:
+
+- **`J1.6` (VCC)** escapes *inward* on B.Cu, into the channel between the connector rows.
+  The router rejects both directions for this pad: outward, IO5's and IO7's routes pass
+  0.4 mm away, exactly the via clearance limit, so no via fits; inward, its stub check
+  fails.
+- **The GND pad tie at (121.5, 89.5) → (122.56, 89.502)** on B.Cu. This is what finally
+  cleared the detached pour fragments. They were not slivers wanting another stitching via
+  — the pour needed a direct tie to that J1 GND pad. `tie_fragments` never found it, and
+  raising its round count made things worse rather than better.
 
 **The TSOP48 pinout is unverified.** It comes from the JEDEC standard, not from the Kioxia
 datasheet, which documents only the BGA. Ring it out against the physical XGecu adapter

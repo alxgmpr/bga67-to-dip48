@@ -63,26 +63,29 @@ pin 1 to pin 24) while the flash carrier wants to be small and replicated:
 
 - `panel/carrier-panel.kicad_pcb` — 4×4 mouse-bite panel, 56.80 × 49.60 mm, 16 up.
 
-- `base/` PCB is placed and routed: **0 DRC violations, 3 unconnected**. Run
-  `make route-base` to rebuild the vias and inner-layer routing; it is additive and
-  re-runnable, and it now also lays the SMD field's landing stubs and vias.
+- `base/` PCB is placed and routed: **0 DRC violations, 0 unconnected**, ERC clean.
+  `make check` passes on both projects. Run `make route-base` to rebuild the vias and
+  inner-layer routing; it is additive and re-runnable, and it now also lays the SMD
+  field's landing stubs and vias.
 - Every connector pad is connected. All 19 used J2 pads have a track endpoint on the pad
-  centre; J1's 13 unlanded pads are exactly the checkerboard's GND pins, which take the
-  pour by design.
-- **`J1.6` (VCC) is hand-routed and the router cannot reproduce it.** It escapes *inward*
-  on B.Cu — a 0.5 mm stub from (125.14, 89.103) into the channel between the connector
-  rows. `escape_and_route` rejects both directions for this pad: outward, IO5's and IO7's
-  routes pass 0.4 mm away, which is exactly the via clearance limit, so no via will fit;
-  inward, its stub check fails. Since `strip()` preserves F.Cu and B.Cu, a `make
-  route-base` rerun leaves this route alone — but verify it is still there afterwards.
+  centre; J1's 12 unlanded pads are exactly the checkerboard's GND pins, which take the
+  pour by design. Cross-checked against KiCad's own connectivity engine
+  (`GetUnconnectedCount() == 0`), not just the DRC report.
+- **Two routes are hand work the router cannot reproduce.** `strip()` preserves F.Cu and
+  B.Cu, so a `make route-base` rerun leaves both alone — but verify they survive:
+  - `J1.6` (VCC) escapes *inward* on B.Cu, a 0.5 mm stub from (125.14, 89.103) into the
+    channel between the connector rows. `escape_and_route` rejects both directions for
+    this pad: outward, IO5's and IO7's routes pass 0.4 mm away, which is exactly the via
+    clearance limit, so no via will fit; inward, its stub check fails.
+  - The GND pad tie at (121.5, 89.5) → (122.56, 89.502) on B.Cu, which cleared the last
+    detached pour fragments.
+
+The detached GND pour fragments that used to sit here are gone. They were not slivers
+needing another stitching via, which is what `tie_fragments` kept trying and failing to
+do — more rounds made it worse, not better. The pour needed one direct tie to a J1 GND
+pad. Worth remembering if fragments reappear after a re-pour.
 
 **Not done:**
-
-- 3 detached GND pour fragments on `base/` — F.Cu slivers trapped between the 48 SMD pads
-  and the 19 landing stubs. `tie_fragments` cannot reach them and raising
-  `ZONE_MIN_THICKNESS` is not available, because the pour has to reach a 0.4 mm-pitch
-  connector. More tie rounds made it worse, not better. This is the only reason
-  `make check` reports `base drc FAIL`.
 - No 3D model on the DF40 30-pin plug or receptacle footprints. The STEP files under
   `carrier/lib/` are the **48**-pin part, not the 30-pin one, and both are now the
   superseded DF40GB shape anyway.
