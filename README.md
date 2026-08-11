@@ -103,16 +103,16 @@ but check they are still there afterwards:
   — the pour needed a direct tie to that J1 GND pad. `tie_fragments` never found it, and
   raising its round count made things worse rather than better.
 
-**The TSOP48 pinout is unverified.** It comes from the JEDEC standard, not from the Kioxia
-datasheet, which documents only the BGA. It is the one claim in this repo that no amount of
-checking in software can reach — both boards would be consistently wrong together.
+**The TSOP48 pinout is confirmed** — see `docs/connector-pinout.md`. It agrees pin-for-pin
+with Samsung's `K9F2G08U0C` 48-TSOP1 datasheet across all 19 used pins *and* all 29 NC
+pins, and 13 of the 15 signals are additionally proven end to end by the 285 MB dump that
+was read through this programmer and adapter — a permuted bus cannot return a valid Read
+ID, let alone a parseable filesystem.
 
-```bash
-python3 tools/ringout.py
-```
-
-prints the probe checklist; record the readings in `docs/ringout-results.txt` and run
-`make ringout`.
+`/WP` and `RY//BY` are the two a read-only dump cannot exercise; both carry 10 k pull-ups
+on board B. What is left is orientation rather than assignment: confirm which corner of
+the adapter is pin 1 against `J2`'s, which is top-left viewed from the top.
+`python3 tools/ringout.py` prints a probe checklist if you want to measure it anyway.
 
 **The DF40TC plug's end pads are unverified.** The DF40T catalog's plug land drawing
 carries 0.475 and 0.35 dimensions at each end that could be hold-down pads, but `TC` means

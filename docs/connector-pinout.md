@@ -224,16 +224,48 @@ the socket's I/O0.
 | VCC | 12, 37 |
 | VSS | 13, 36 |
 
-**Unverified.** This comes from the JEDEC standard, not from the Kioxia datasheet, which
-documents only the BGA. Ring it out against the actual XGecu adapter before ordering board
-B — nothing in software can catch it being wrong, because both boards would be
-consistently wrong together and ERC, DRC and a netlist diff would all pass.
+**Confirmed.** This was flagged for a long time as "JEDEC hearsay, ring it out" — that was
+too pessimistic. Three independent lines of evidence now agree, and none of them is a
+multimeter.
 
-`tools/ringout.py` drives this. Run it with no arguments for the probe checklist (19 used
-pins, each with the neighbours that must stay open), record the readings in
-`docs/ringout-results.txt`, then `make ringout`. It names the failure mode rather than
-just diffing: a uniform offset or a mirror is a one-line table fix, whereas an irregular
-mapping that touches the data bus means board B has to be rerouted before it is ordered.
+1. **Two manufacturer datasheets.** The table was originally composed from Kioxia's
+   `TC58BVG1S3HTA00`, the TSOP-48 sibling of our die family (our own `TC58NVG1S3HBAI6`
+   datasheet documents only the BGA — 66 pages, no TSOP mention). It has since been
+   checked pin-for-pin against Samsung's `K9F2G08U0C` (2 Gb x8 NAND, 48-TSOP1, Rev 0.2
+   p.5), an unrelated vendor's part in the same package class. **All 19 used pins agree,
+   and so do all 29 NC pins.** A 48-pin table that matches another vendor's exactly,
+   including every no-connect, is the standard pinout.
+
+2. **A working 285 MB dump.** The image was read with this exact programmer and adapter,
+   Read ID `98 DA 90 15`, and it de-interleaves at 2048+128 with factory bad-block markers
+   landing exactly on OOB byte 0 of pages 0 and 1; its ECC was recovered, its YAFFS2
+   volumes parsed and its DTB came back byte-perfect. **None of that is reachable through
+   a permuted bus.** Commands and addresses ride the same I/O pins, so a single swapped
+   line corrupts the command byte and the device answers nothing at all. That result
+   exercises IO1–IO8, CLE, ALE, `/WE`, `/RE` and `/CE` — 13 of the 15 signals — plus VCC
+   and VSS, end to end through the real hardware.
+
+3. **The programmer's ZIF is TSOP-48 ordered by construction.** A bare TSOP-48 NAND drops
+   straight into the T76's 48-pin ZIF with no adapter at all. That is only possible if ZIF
+   pin N carries TSOP-48 signal N, which is the mapping board B has to match.
+
+**What the dump does not prove**, precisely: `/WP` and `RY//BY`. A read-only operation
+never exercises them — `/WP` only gates program and erase, and a programmer that cannot
+see `RY//BY` falls back to polling the status register over the bus, so a dead ready line
+still yields a correct dump. Both carry 10 k pull-ups on board B (`R1`, `R2`), which is the
+right hedge for exactly these two.
+
+So the signal assignment is settled. The residual risk is **orientation, not assignment**:
+which physical corner of the mating part is pin 1. On board B, `J2` pin 1 is at the
+top-left with pins 1–24 down the left column and 25–48 back up the right, silk dot
+outboard of pin 1, viewed from the top — see "Mirror check" above, and confirm against the
+adapter's own pin 1 before ordering.
+
+`tools/ringout.py` remains available if you want the measurement anyway: run it with no
+arguments for a probe checklist, record readings in `docs/ringout-results.txt`, then
+`make ringout`. It names the failure mode rather than just diffing, since a uniform offset
+or a mirror is a one-line table fix whereas an irregular mapping touching the data bus
+means board B is rerouted before it is ordered.
 
 Only ~21 of the 48 positions need pins populated (the 17 nets plus corner pins for
 retention), but the board must still span pin 1 to pin 24: 23 × 2.54 = 58.42 mm.

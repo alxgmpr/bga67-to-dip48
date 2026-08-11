@@ -89,11 +89,12 @@ pad. Worth remembering if fragments reappear after a re-pour.
 - No 3D model on the DF40 30-pin plug or receptacle footprints. The STEP files under
   `carrier/lib/` are the **48**-pin part, not the 30-pin one, and both are now the
   superseded DF40GB shape anyway.
-- TSOP48 pinout still unverified against the physical XGecu adapter. `tools/ringout.py`
-  prints the probe checklist and checks the readings; record them in
-  `docs/ringout-results.txt` and run `make ringout`. Deliberately not part of `make check`,
-  because it needs a human with a meter. Also still open from that same bench session: the
-  socket's row spacing, and where its pin 1 sits relative to the lever.
+- TSOP48 pinout: **confirmed**, see docs/connector-pinout.md. Matches Samsung
+  `K9F2G08U0C` 48-TSOP1 on all 19 used pins and all 29 NC pins, and 13 of 15 signals are
+  proven end to end by the working dump. `/WP` and `RY//BY` are not exercised by a
+  read-only dump; both have 10 k pull-ups on board B. Still worth confirming on the bench,
+  and `tools/ringout.py` will check the readings: the adapter's **pin 1 corner** and the
+  socket's row spacing. Orientation is the residual risk, not signal assignment.
 - The DF40TC plug's end pads are unverified — see "Unverified" below.
 - **Nothing checks that the XGecu adapter's body clears the base board.** The DIP48 field
   is surface mount now, so the adapter seats ~3 mm lower than it would have.
@@ -251,8 +252,10 @@ The footprint omits them. That is the safe direction to be wrong in: if the part
 hold-downs they go unsoldered and you lose a little retention, whereas pads under a
 housing with no metal there would take paste and tilt a 0.4 mm-pitch connector.
 
-**The TSOP48 pinout in `docs/connector-pinout.md` comes from the JEDEC standard, not from
-the Kioxia datasheet**, which documents only the BGA. Ring it out against the physical XGecu
+**The TSOP48 pinout is no longer in this section** -- it is confirmed, see
+docs/connector-pinout.md. Two independent manufacturer datasheets agree pin-for-pin
+including every no-connect, and the working dump proves 13 of 15 signals end to end
+through the real programmer and adapter. Ring it out against the physical XGecu
 adapter before committing the base board layout. Also confirm the socket's row spacing is
 0.6″ and where its pin 1 sits relative to the lever.
 
