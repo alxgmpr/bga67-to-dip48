@@ -15,6 +15,41 @@
 # settings for them.  This file carries only the constraints that need a
 # condition -- the ones KiCad cannot express as a single global number.
 
+# ---------------------------------------------------------------------- BGA
+
+# Source: "BGA Design Guidelines - PCB Layout Recommendations for BGA
+# packages", JLCPCB, updated 2025-12-27, retrieved 2026-08-11.  The 4-layer
+# conventional-via table specifies:
+#   H  via drill diameter                 0.15 mm
+#   P  via copper diameter                0.25 mm
+#   B  BGA pad diameter                   0.25 mm
+#   D  drill to BGA pad spacing           0 mm
+#   S  trace to trace spacing             0.09 mm
+#   C  trace to BGA pad spacing           0.10 mm
+#   G  via copper to BGA pad spacing      0.10 mm
+# H, P, and S are already enforced by the global project settings.  D is zero.
+# The three remaining non-global constraints are scoped to the mirrored BGA
+# land footprint by library identifier, so reference renumbering during
+# panelization does not disable them.
+
+(rule "JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
 # ------------------------------------------------------------------- Traces
 
 # "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our

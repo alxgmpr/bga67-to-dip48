@@ -44,6 +44,20 @@ those as a single global number.
 | Min text height / line | 1.00 / 0.15 mm | Legend |
 | Soldermask expansion | 1:1 (0) | Soldermask |
 
+The BGA-specific 4-layer rules from JLCPCB's *BGA Design Guidelines* are also
+enforced for the mirrored VFBGA67 land footprint:
+
+| BGA limit | Value | KiCad constraint |
+|---|---:|---|
+| BGA pad diameter | 0.25 mm | `assertion` on both pad dimensions |
+| BGA pad to different-net trace | 0.10 mm | `clearance` |
+| BGA pad to via copper, including same-net vias | 0.10 mm | `physical_clearance` |
+
+The page's 0.15 mm via drill, 0.25 mm via diameter, and 0.09 mm trace spacing
+limits are already covered by the global rules above. Its 4-layer drill-to-BGA
+pad minimum is zero. The footprint library identifier, rather than `U1`, scopes
+the custom rules so they survive reference renumbering during panelization.
+
 One rule is `severity warning` rather than an error: **via diameter under 0.45 mm**. That
 is a cost boundary, not a manufacturability one — *"0.15 mm hole size with any size via
 diameter, and 0.2 mm or 0.25 mm hole size with via diameter less than 0.45 mm, will cost
