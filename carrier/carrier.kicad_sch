@@ -20,8 +20,8 @@
 			(on_board yes)
 			(in_pos_files yes)
 			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "J"
-				(at 0 22.86 0)
+			(property "Reference" "J1"
+				(at 0 25.4 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(effects
@@ -31,7 +31,7 @@
 				)
 			)
 			(property "Value" "DF40TC-30DP-0.4V(51)"
-				(at 0 -35.56 0)
+				(at 0 22.86 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(effects
@@ -51,22 +51,20 @@
 					)
 				)
 			)
-			(property "Datasheet" "~"
+			(property "Datasheet" ""
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
-				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
 				)
 			)
-			(property "Description" ""
-				(at 0 0 0)
+			(property "Description" "Generic connector, double row, 02x28, counter clockwise pin numbering scheme (similar to DIP package numbering), script generated (kicad-library-utils/schlib/autogen/connector/)"
+				(at 3.048 34.798 0)
 				(show_name no)
 				(do_not_autoplace no)
-				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -75,8 +73,8 @@
 			)
 			(symbol "DF40TC-30DP-0.4V_51__0_1"
 				(rectangle
-					(start -7.62 -33.02)
-					(end 7.62 20.32)
+					(start -7.62 20.32)
+					(end 7.62 -33.02)
 					(stroke
 						(width 0.254)
 						(type default)
@@ -618,6 +616,78 @@
 						)
 					)
 					(number "30"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin free line
+					(at 3.81 -35.56 90)
+					(length 2.54)
+					(name "MT1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "MT1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin free line
+					(at 1.27 -35.56 90)
+					(length 2.54)
+					(name "MT2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "MT2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin free line
+					(at -1.27 -35.56 90)
+					(length 2.54)
+					(name "MT3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "MT3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin free line
+					(at -3.81 -35.56 90)
+					(length 2.54)
+					(name "MT4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "MT4"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -2287,6 +2357,12 @@
 		(uuid "047b1e51-9a00-41fb-b499-a1ee4bcadb23")
 	)
 	(junction
+		(at 204.47 95.25)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "0a163c4d-0fae-46fd-97cf-4258aa2e994e")
+	)
+	(junction
 		(at 78.74 46.99)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -2299,10 +2375,10 @@
 		(uuid "1a37decc-091e-476c-a652-59b87f82e69c")
 	)
 	(junction
-		(at 213.36 90.17)
+		(at 204.47 97.79)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "24101fbc-2a84-4126-8aed-6ef537c37236")
+		(uuid "28067991-9f3a-47a6-ba43-9b5165c37bd5")
 	)
 	(junction
 		(at 213.36 99.06)
@@ -2323,22 +2399,10 @@
 		(uuid "4a33e651-db52-4486-b7a4-61b3502dfbe1")
 	)
 	(junction
-		(at 213.36 85.09)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "5143c729-0e4b-444e-a88e-ff7f7e588760")
-	)
-	(junction
 		(at 179.07 64.77)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "6039c64f-b545-49a1-b5b0-1513c4dfbf5d")
-	)
-	(junction
-		(at 213.36 87.63)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "71c90558-97f9-4316-abec-c60f7d72fba2")
 	)
 	(junction
 		(at 91.44 138.43)
@@ -2377,22 +2441,28 @@
 		(uuid "9974e6ce-074a-498b-a847-d5b3159821bc")
 	)
 	(junction
+		(at 201.93 95.25)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "9978bd24-f262-407c-83b6-648a1cf5d63a")
+	)
+	(junction
 		(at 179.07 59.69)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "bad3ef69-345d-4c8f-afc9-a50918f68725")
 	)
 	(junction
-		(at 213.36 82.55)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "da4f93b9-0412-4f45-87f7-5cab3c237439")
-	)
-	(junction
 		(at 83.82 138.43)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "f1face89-6f05-4a19-bab1-37b4fa210bf0")
+	)
+	(junction
+		(at 199.39 95.25)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "f5bec487-a1bb-4ff1-824f-d4d84537b3a1")
 	)
 	(junction
 		(at 226.06 46.99)
@@ -2402,13 +2472,13 @@
 	)
 	(wire
 		(pts
-			(xy 213.36 87.63) (xy 213.36 90.17)
+			(xy 199.39 95.25) (xy 201.93 95.25)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "02b64236-f867-48df-b8ba-106ba2a00678")
+		(uuid "07f36488-0e40-4b13-8986-e120401b1c6e")
 	)
 	(wire
 		(pts
@@ -2509,6 +2579,16 @@
 			(type default)
 		)
 		(uuid "21ed4460-ef7f-4634-969c-34eae06bc358")
+	)
+	(wire
+		(pts
+			(xy 204.47 95.25) (xy 204.47 97.79)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "28acb769-2303-44a1-8b17-f2fa208abda0")
 	)
 	(wire
 		(pts
@@ -2792,7 +2872,7 @@
 	)
 	(wire
 		(pts
-			(xy 179.07 97.79) (xy 213.36 97.79)
+			(xy 179.07 97.79) (xy 204.47 97.79)
 		)
 		(stroke
 			(width 0)
@@ -2902,16 +2982,6 @@
 	)
 	(wire
 		(pts
-			(xy 213.36 82.55) (xy 213.36 85.09)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a6c988ee-6bfc-4048-89bc-fa04d9761d23")
-	)
-	(wire
-		(pts
 			(xy 210.82 77.47) (xy 213.36 77.47)
 		)
 		(stroke
@@ -2952,6 +3022,16 @@
 	)
 	(wire
 		(pts
+			(xy 196.85 95.25) (xy 199.39 95.25)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "afa1d83d-afec-41f8-bf34-cbdb9019fdd1")
+	)
+	(wire
+		(pts
 			(xy 101.6 67.31) (xy 104.14 67.31)
 		)
 		(stroke
@@ -2982,13 +3062,23 @@
 	)
 	(wire
 		(pts
-			(xy 213.36 97.79) (xy 213.36 90.17)
+			(xy 213.36 77.47) (xy 213.36 97.79)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "bdb4d061-5a5c-4dcc-a10d-ef8c36c10462")
+	)
+	(wire
+		(pts
+			(xy 201.93 95.25) (xy 204.47 95.25)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "be08c555-7f94-4337-975b-d51e0b4445a0")
 	)
 	(wire
 		(pts
@@ -3052,6 +3142,16 @@
 	)
 	(wire
 		(pts
+			(xy 204.47 97.79) (xy 213.36 97.79)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d9a047fd-d17c-4c25-8491-99d4884f5d26")
+	)
+	(wire
+		(pts
 			(xy 210.82 72.39) (xy 223.52 72.39)
 		)
 		(stroke
@@ -3112,26 +3212,6 @@
 	)
 	(wire
 		(pts
-			(xy 213.36 85.09) (xy 213.36 87.63)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f1bd2a0d-7e51-447e-8eaf-07aa1e430123")
-	)
-	(wire
-		(pts
-			(xy 213.36 77.47) (xy 213.36 82.55)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f459ab85-07d2-4b32-a1cb-9a7b3dc630d3")
-	)
-	(wire
-		(pts
 			(xy 210.82 74.93) (xy 213.36 74.93)
 		)
 		(stroke
@@ -3141,7 +3221,7 @@
 		(uuid "ff5e0b60-8f9c-4778-82be-811f02c7a901")
 	)
 	(label "IO3"
-		(at 187.96 46.99 180)
+		(at 187.96 72.39 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3161,7 +3241,7 @@
 		(uuid "09a6dab7-c6a5-43f0-9983-552fc708b622")
 	)
 	(label "{slash}WP"
-		(at 187.96 77.47 180)
+		(at 187.96 41.91 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3171,7 +3251,7 @@
 		(uuid "2124511d-4824-44b7-8e6b-ea11244b213d")
 	)
 	(label "RY{slash}{slash}BY"
-		(at 213.36 64.77 0)
+		(at 213.36 54.61 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3181,7 +3261,7 @@
 		(uuid "22bb4793-ed1a-4fc7-b087-a14cd69c7f5f")
 	)
 	(label "{slash}CE"
-		(at 213.36 74.93 0)
+		(at 213.36 49.53 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3201,7 +3281,7 @@
 		(uuid "32c93fd8-7161-43c5-9372-5773ceff6f78")
 	)
 	(label "{slash}RE"
-		(at 187.96 67.31 180)
+		(at 187.96 52.07 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3221,7 +3301,7 @@
 		(uuid "49f02c7b-b26e-4f91-9010-b3b49d509dab")
 	)
 	(label "IO1"
-		(at 187.96 57.15 180)
+		(at 187.96 62.23 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3241,7 +3321,7 @@
 		(uuid "62517026-999e-49e1-ab04-88b86fa0c823")
 	)
 	(label "IO8"
-		(at 213.36 54.61 0)
+		(at 213.36 59.69 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3251,7 +3331,7 @@
 		(uuid "62e91c7a-f7cf-4200-9817-6446983de5de")
 	)
 	(label "IO7"
-		(at 213.36 44.45 0)
+		(at 213.36 69.85 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3261,7 +3341,7 @@
 		(uuid "664f25f8-4ed9-4f4f-9308-6836e9287dc1")
 	)
 	(label "IO5"
-		(at 213.36 49.53 0)
+		(at 213.36 74.93 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3301,7 +3381,7 @@
 		(uuid "8906c332-f022-411c-ae8c-4ec516751c2b")
 	)
 	(label "{slash}WE"
-		(at 213.36 69.85 0)
+		(at 213.36 44.45 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3331,7 +3411,7 @@
 		(uuid "a9907bd6-a467-4eff-ab3e-eecaa79ce35f")
 	)
 	(label "ALE"
-		(at 187.96 72.39 180)
+		(at 187.96 46.99 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3361,7 +3441,7 @@
 		(uuid "d078d5dd-a0d5-4bc0-86bc-96b11c2b98b4")
 	)
 	(label "IO2"
-		(at 187.96 52.07 180)
+		(at 187.96 67.31 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3391,7 +3471,7 @@
 		(uuid "e7b4cbd9-1e4b-4b63-bb28-24cee8606549")
 	)
 	(label "CLE"
-		(at 187.96 62.23 180)
+		(at 187.96 57.15 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3411,7 +3491,7 @@
 		(uuid "f186c04c-5efe-495d-be13-fec8a48ea080")
 	)
 	(label "IO4"
-		(at 187.96 41.91 180)
+		(at 187.96 77.47 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3431,7 +3511,7 @@
 		(uuid "fc983471-4d2d-4139-941d-90becdec8d1c")
 	)
 	(label "IO6"
-		(at 213.36 59.69 0)
+		(at 213.36 64.77 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3874,6 +3954,18 @@
 		(pin "30"
 			(uuid "8fc6f5ce-26c8-4f42-bc94-37b2a909af04")
 		)
+		(pin "MT4"
+			(uuid "2d821a16-fc6a-4b1b-9e9e-de23984c3358")
+		)
+		(pin "MT3"
+			(uuid "7eeefe32-dc13-4981-ba42-d2f3858bf9f6")
+		)
+		(pin "MT1"
+			(uuid "dd448d21-82b9-477a-8a14-d35fda665991")
+		)
+		(pin "MT2"
+			(uuid "4c6550e4-9f81-49c2-82d2-37060837087f")
+		)
 		(instances
 			(project "carrier"
 				(path "/35aefae1-b7b4-44f2-b6e6-ae33bc9564cb"
@@ -4091,7 +4183,7 @@
 				)
 			)
 		)
-		(property "Description" "Logical pin-map interface for the chipless mirrored VFBGA67 land field soldered to the Google Home motherboard; not a populated NAND."
+		(property "Description" ""
 			(at 63.5 54.61 0)
 			(show_name no)
 			(do_not_autoplace no)
