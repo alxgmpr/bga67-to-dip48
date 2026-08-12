@@ -1039,6 +1039,7 @@
 		(sheetname "/")
 		(sheetfile "carrier.kicad_sch")
 		(solder_mask_margin 0.05)
+		(clearance 0.1)
 		(attr smd exclude_from_pos_files exclude_from_bom)
 		(duplicate_pad_numbers_are_jumpers no)
 		(pad "A2" smd circle
