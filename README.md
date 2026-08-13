@@ -26,6 +26,8 @@ the Google motherboard; it has no NAND package and no sacrificial memory.
 |---|---|---:|
 | `carrier/` | mirrored VFBGA67 motherboard lands + DF40 plug | 8.41 × 7.60 mm |
 | `base/` | DIP48 socket for XGecu adapter + DF40 receptacle + passives | 27.78 × 61.38 mm |
+| `chip/` | real VFBGA67 lands + DF40 receptacle, NAND soldered here | 8.41 × 7.60 mm |
+| `prog/` | DF40 plug + DIP48 male pins for the XGecu T76 ZIF | 27.78 × 61.38 mm |
 
 ## Compact routed carrier
 
@@ -44,9 +46,9 @@ The 47 unused motherboard lands remain floating. `U1` is only a logical pin map 
 land interface; it is excluded from BOM/position output and has no NAND model or package
 graphics.
 
-The carrier is routed. The base still needs its signal reroute after correcting the former
-double-mirrored connector table; do not fabricate it until DRC reports zero unconnected
-items.
+The carrier and the base are both routed. Base DRC reports zero unconnected items and zero
+schematic parity issues; its remaining 20 warnings are all `text thickness out of range` on
+silkscreen and are cosmetic.
 
 ## Mechanical load path
 

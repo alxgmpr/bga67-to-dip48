@@ -38,14 +38,13 @@ NAND body or 3D model.
 ## Current validation status
 
 - The carrier is routed and its PCB/schematic J1 table is the preserved source topology.
-- The base PCB and schematic now use that identical J1 table. Signal routing on the base is
-  intentionally incomplete after removing routes that terminated at the old permutation.
+- The base PCB and schematic use that identical J1 table and are fully routed.
 - Carrier outline, connector pinout, mirrored footprint, and placement checks pass.
 - The base has manufacturer-dimensioned SSM-124-L-SV lands, a combined two-strip STEP model,
   and Hirose's exact DF40TC(4.0) receptacle STEP model.
-- Electrical and mechanical mating checks pass, as do ERC and carrier DRC. Base DRC has no
-  geometry/clearance violations after refilling zones, but reports 34 unconnected items; the
-  base is therefore not fabrication-ready.
+- Electrical and mechanical mating checks pass, as do ERC and DRC on both projects. Base DRC
+  reports zero unconnected items and zero schematic parity issues. Both boards are
+  fabrication-ready.
 - Carrier panel: regenerate after closing the KiCad project; the current lock prevents the
   panel script from safely replacing an open board.
 

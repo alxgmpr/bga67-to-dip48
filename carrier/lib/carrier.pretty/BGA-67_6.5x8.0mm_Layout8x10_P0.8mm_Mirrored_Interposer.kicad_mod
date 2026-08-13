@@ -3,7 +3,7 @@
 	(generator "pcbnew")
 	(generator_version "10.0")
 	(layer "B.Cu")
-	(descr "Chipless mirrored VFBGA-67 land interface for face-to-face mounting on the Google Home motherboard NAND footprint. Ball columns are mirrored in X; no NAND component is fitted. No paste layer; the interposer receives solder balls before mounting.")
+	(descr "Chipless mirrored VFBGA-67 land interface for face-to-face mounting on the Google Home motherboard NAND footprint. Local pad coordinates are the normal land pattern rotated 180 degrees, not mirrored: ball A2 moves from (-2.0, -3.6) to (+2.0, +3.6). The physical mirror comes from placing this footprint on B.Cu. Verified by tools/bga_fit.py, which fits the placed pads against the normal pattern and rejects a reflected best fit; carrier A fits as a proper 90 degree rotation with zero residual. Despite the name, do not assume a single-axis mirror. This interposer is chipless: no NAND component is fitted. No paste layer; the interposer receives solder balls before mounting.")
 	(property "Reference" "REF**"
 		(at 0 -5.05 0)
 		(layer "B.SilkS")

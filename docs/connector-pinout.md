@@ -3,6 +3,21 @@
 The NAND remains in the XGecu adapter. Board A is a permanent chipless interposer; board B
 receives the removable adapter's DIP48 pins. The DF40 pair is normally left mated.
 
+## Three roles, one interface
+
+The DF40 30-position same-number contract is the invariant of the whole system. Three board
+roles plug into it:
+
+| Role | Board | Specific to |
+|---|---|---|
+| Target adapter | `carrier/` | the footprint being tapped |
+| Device carrier | `chip/` | the NAND package |
+| Host adapter | `base/`, `prog/` | the programmer or clamp adapter |
+
+A new target, package, or programmer means one new board in one role, not a new system. The
+electrical side is sized for this NAND specifically — 30 positions carrying 15 signals plus
+power — so this is a documented pattern, not a general-purpose fixture.
+
 - Carrier: `DF40TC-30DP-0.4V(51)` plug
 - Base: `DF40TC(4.0)-30DS-0.4V(51)` receptacle
 - Pitch: 0.4 mm; mated height: 4.0 mm
