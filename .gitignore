@@ -4,3 +4,4 @@ __pycache__/
 ~*.lck
 panel/fabrication-toolkit-options.json
 .history/
+.mcp-backups/

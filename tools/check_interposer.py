@@ -265,7 +265,69 @@ def check():
     ):
         assert obsolete not in documentation, f"obsolete architecture remains: {obsolete}"
 
+    check_chip()
+
+
+def check_chip():
+    """Board C: real chip on F.Cu, receptacle on B.Cu, no mirror anywhere.
+
+    kicad-cli's DRC parity check compares references and nets only.  It does
+    not notice that a board still carries the footprint the schematic no longer
+    asks for, so `make check` alone will report a stale board as clean.  These
+    assertions are the gate that does notice.
+    """
+    board = pcbnew.LoadBoard(str(ROOT / "chip" / "chip.kicad_pcb"))
+    interface = board.FindFootprintByReference("U1")
+    connector = board.FindFootprintByReference("J1")
+
+    assert interface.GetLayer() == pcbnew.F_Cu, "board C's NAND must be top-side"
+    assert connector.GetLayer() == pcbnew.B_Cu, "board C's receptacle must be bottom-side"
+
+    name = str(interface.GetFPID().GetLibItemName())
+    assert "Mirrored" not in name, (
+        f"board C must use the normal land pattern, got {name}"
+    )
+
+    # The netlist check cannot catch a plug left on board C: plug and receptacle
+    # share pin numbering by design, so a verbatim copy of the carrier passes it.
+    # Only the footprint identity distinguishes them.
+    connector_name = str(connector.GetFPID().GetLibItemName())
+    assert "30DS" in connector_name, (
+        f"board C needs the DF40 receptacle (30DS), got {connector_name}"
+    )
+    assert not {"MT1", "MT2", "MT3", "MT4"} & {
+        str(pad.GetNumber()) for pad in connector.Pads()
+    }, "board C's J1 has the plug's MT retention lands; it is still a plug"
+
+    reference = read_footprint_pads(NORMAL_FOOTPRINT)
+    placed = {
+        str(pad.GetNumber()): (mm(pad.GetPosition().x), mm(pad.GetPosition().y))
+        for pad in interface.Pads()
+    }
+    assert len(placed) == 67, f"board C U1 has {len(placed)} pads, expected 67"
+    assert_no_mirror(reference, placed, "chip U1")
+
+    edge_box = board.GetBoardEdgesBoundingBox()
+    assert abs(mm(edge_box.GetWidth()) - 8.42) < 0.02, mm(edge_box.GetWidth())
+    assert abs(mm(edge_box.GetHeight()) - 7.61) < 0.02, mm(edge_box.GetHeight())
+
+    for via in [t for t in board.GetTracks() if t.GetClass() == "PCB_VIA"]:
+        assert via.GetViaType() == pcbnew.VIATYPE_THROUGH, (
+            f"{via.GetNetname()} uses a non-through via"
+        )
+        assert mm(via.GetDrillValue()) >= 0.20 - 1e-6, mm(via.GetDrillValue())
+        for pad in interface.Pads():
+            separation = (
+                (mm(via.GetPosition().x - pad.GetPosition().x) ** 2)
+                + (mm(via.GetPosition().y - pad.GetPosition().y) ** 2)
+            ) ** 0.5
+            assert separation >= 0.35, (
+                f"{via.GetNetname()} via is in or too near U1 pad "
+                f"{pad.GetNumber()} ({separation:.3f} mm)"
+            )
+
 
 if __name__ == "__main__":
     check()
     print("interposer geometry OK: chipless and mirrored; connector escape offset <0.20 mm")
+    print("board C geometry OK: normal land pattern on F.Cu, receptacle on B.Cu")
