@@ -731,13 +731,13 @@
         "uuid": "35aefae1-b7b4-44f2-b6e6-ae33bc9564cb"
       }
     ],
-    "used_designators": "U1,#PWR1-5,J1-2",
+    "used_designators": "U1,#PWR1-10,J1-2",
     "variants": []
   },
   "sheets": [
     [
       "35aefae1-b7b4-44f2-b6e6-ae33bc9564cb",
-      "Root"
+      "chip"
     ]
   ],
   "text_variables": {},
