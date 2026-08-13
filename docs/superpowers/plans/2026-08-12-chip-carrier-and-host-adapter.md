@@ -310,19 +310,31 @@ Expected: `mating netlist OK`, `interposer geometry OK`, then `carrier`/`base` E
 
 Temporarily reflect the reference inside `check()` and confirm the assertion fires. Do not commit this edit.
 
+Two traps here. `make check` runs `check_interposer.py 2>/dev/null`, so an `AssertionError` message is discarded — run the script **directly** instead. And `git checkout` would restore the last commit, which at this point is the state *before* Step 2, destroying this task's work — restore from a copy instead.
+
 ```bash
+cp tools/check_interposer.py /tmp/ci-backup.py
 python3 - <<'EOF'
 import pathlib
 p = pathlib.Path("tools/check_interposer.py")
 t = p.read_text()
-p.write_text(t.replace('assert_no_mirror(reference, placed, "carrier U1")',
-    'assert_no_mirror({k: (x, -y) for k, (x, y) in reference.items()}, placed, "carrier U1")'))
+new = t.replace('assert_no_mirror(reference, placed, "carrier U1")',
+    'assert_no_mirror({k: (x, -y) for k, (x, y) in reference.items()}, placed, "carrier U1")')
+assert new != t, "replacement target not found"
+p.write_text(new)
 EOF
-make check 2>&1 | grep -i mirrored || echo "NO FAILURE - the check is not wired in"
-git checkout tools/check_interposer.py
+/Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python \
+  tools/check_interposer.py 2>&1 | grep -iE 'MIRRORED|AssertionError'
+cp /tmp/ci-backup.py tools/check_interposer.py
 ```
 
-Expected: a line containing `is MIRRORED against its reference land pattern`. If you see `NO FAILURE`, the replacement in Step 2 did not take effect.
+Expected:
+
+```
+AssertionError: carrier U1 is MIRRORED against its reference land pattern: proper-rotation residual 2.744750 mm, reflected residual 0.000000 mm
+```
+
+If grep prints nothing, the replacement in Step 2 did not take effect.
 
 - [ ] **Step 7: Commit**
 

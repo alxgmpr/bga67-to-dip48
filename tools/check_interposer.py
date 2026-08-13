@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pcbnew
 
+from bga_fit import assert_no_mirror, read_footprint_pads
 from pinout import DF40
 
 
@@ -18,6 +19,13 @@ FOOTPRINT = (
     / "BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer.kicad_mod"
 )
 FOOTPRINT_NAME = "BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer"
+NORMAL_FOOTPRINT = (
+    ROOT
+    / "carrier"
+    / "lib"
+    / "carrier.pretty"
+    / "BGA-67_6.5x8.0mm_Layout8x10_P0.8mm.kicad_mod"
+)
 DF40_PLUG_FOOTPRINT = (
     ROOT
     / "carrier"
@@ -33,18 +41,6 @@ DF40_RECEPTACLE_FOOTPRINT = (
     / "HIROSE_DF40TC_4.0_-30DS-0.4V_51_.kicad_mod"
 )
 
-ROW_Y_MM = {
-    "A": 3.6,
-    "B": 2.8,
-    "C": 2.0,
-    "D": 1.2,
-    "E": 0.4,
-    "F": -0.4,
-    "G": -1.2,
-    "H": -2.0,
-    "J": -2.8,
-    "K": -3.6,
-}
 
 def mm(value):
     return pcbnew.ToMM(value)
@@ -132,29 +128,31 @@ def check():
         assert abs(mm(plug_position.x) + mm(receptacle_position.x)) < 1e-6, number
         assert mm(plug_position.y) * mm(receptacle_position.y) > 0, number
 
-    for pad in interface.Pads():
-        ball = str(pad.GetNumber())
-        row, column = ball[0], int(ball[1:])
-        position = pad.GetFPRelativePosition()
-        expected_x = -(column - 4.5) * 0.8
-        expected_y = ROW_Y_MM[row]
-        assert abs(mm(position.x) - expected_x) < 1e-6, (
-            f"ball {ball}: x={mm(position.x):.3f}, expected mirrored x={expected_x:.3f}"
-        )
-        assert abs(mm(position.y) - expected_y) < 1e-6, (
-            f"ball {ball}: y={mm(position.y):.3f}, expected y={expected_y:.3f}"
-        )
+    # Carrier A's B.Cu pads and the motherboard's lands are both seen looking
+    # down at the assembly, so the pattern must agree under rotation only.  A
+    # reflection here would put every ball on the wrong land.
+    reference = read_footprint_pads(NORMAL_FOOTPRINT)
+    placed = {
+        str(pad.GetNumber()): (mm(pad.GetPosition().x), mm(pad.GetPosition().y))
+        for pad in interface.Pads()
+    }
+    assert len(placed) == 67, f"U1 has {len(placed)} pads, expected 67"
+    assert_no_mirror(reference, placed, "carrier U1")
 
     library_interface = pcbnew.FootprintLoad(str(FOOTPRINT.parent), FOOTPRINT_NAME)
     assert library_interface is not None
     assert library_interface.GetValue() == "HOME_VFBGA67_INTERFACE"
     assert len(library_interface.Models()) == 0
-    for pad in library_interface.Pads():
-        ball = str(pad.GetNumber())
-        row, column = ball[0], int(ball[1:])
-        position = pad.GetFPRelativePosition()
-        assert abs(mm(position.x) - (-(column - 4.5) * 0.8)) < 1e-6
-        assert abs(mm(position.y) - ROW_Y_MM[row]) < 1e-6
+    # The library footprint's local coordinates are the normal pattern rotated
+    # 180 degrees, not mirrored; the physical mirror comes from placing it on
+    # B.Cu.  Either way the composed result must not be a reflection.
+    library_pads = {
+        str(pad.GetNumber()): (mm(pad.GetFPRelativePosition().x),
+                               mm(pad.GetFPRelativePosition().y))
+        for pad in library_interface.Pads()
+    }
+    assert len(library_pads) == 67, f"library footprint has {len(library_pads)} pads"
+    assert_no_mirror(reference, library_pads, "Mirrored_Interposer library footprint")
 
     # The current routed carrier uses a compact 8.41 x 7.60 mm outline.  The
     # drawing stroke expands the reported bounding box by 0.01 mm overall.
