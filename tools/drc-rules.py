@@ -30,6 +30,7 @@ DRU = ROOT / 'tools' / 'jlc-4layer.kicad_dru'
 PROJECTS = [
     (ROOT / 'carrier' / 'carrier.kicad_pro', True),
     (ROOT / 'base' / 'base.kicad_pro', True),
+    (ROOT / 'chip' / 'chip.kicad_pro', True),
     (ROOT / 'panel' / 'carrier-panel.kicad_pro', False),
 ]
 

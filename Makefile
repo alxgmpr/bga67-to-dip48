@@ -29,7 +29,7 @@ check: pinout
 	@python3 tools/check_mating.py
 	@$(KICAD_PY) tools/check_interposer.py 2>/dev/null
 	@./tools/drc-rules.py --check
-	@check_result=0; for p in carrier base; do \
+	@check_result=0; for p in carrier base chip; do \
 		printf '%-8s erc  ' $$p; \
 		$(KICAD_CLI) sch erc --exit-code-violations --severity-error \
 			-o /tmp/$$p-erc.json --format json $$p/$$p.kicad_sch >/dev/null 2>&1 \

@@ -509,7 +509,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "carrier.kicad_pro",
+    "filename": "chip.kicad_pro",
     "version": 3
   },
   "net_settings": {
@@ -726,8 +726,8 @@
     "subpart_id_separator": 0,
     "top_level_sheets": [
       {
-        "filename": "carrier.kicad_sch",
-        "name": "Root",
+        "filename": "chip.kicad_sch",
+        "name": "chip",
         "uuid": "35aefae1-b7b4-44f2-b6e6-ae33bc9564cb"
       }
     ],
