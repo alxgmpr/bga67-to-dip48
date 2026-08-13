@@ -64,6 +64,19 @@ def check():
     assert base_j1 == expected_df40, ("base J1", base_j1)
     assert carrier_j1 == base_j1, "plug and receptacle must be same-number mapped"
 
+    # Board C carries the real NAND.  Its ball -> net map must be identical to
+    # carrier A's, and its J1 must be the same canonical table, which together
+    # mean the chip on board C sees exactly what the target motherboard would
+    # have driven it with.
+    chip_j1 = schematic_pin_map("chip", "J1")
+    chip_u1 = schematic_pin_map("chip", "U1")
+    assert chip_j1 == expected_df40, ("chip J1", chip_j1)
+    carrier_u1_map = schematic_pin_map("carrier", "U1")
+    assert chip_u1 == carrier_u1_map, (
+        "chip U1 and carrier U1 disagree on ball -> net; the chip would be "
+        "driven differently than the motherboard drives it"
+    )
+
     carrier_u1 = schematic_pin_map("carrier", "U1")
     for ball, net in BGA67.items():
         assert carrier_u1[ball] == net, (ball, carrier_u1[ball], net)

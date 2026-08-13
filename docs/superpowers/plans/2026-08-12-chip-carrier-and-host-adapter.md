@@ -553,6 +553,7 @@ Open `chip/chip.kicad_pro` in KiCad and make exactly these changes:
 2. `J1` — replace the `DF40TC-30DP-0.4V_51_` plug symbol with `DF40TC_4.0_-30DS-0.4V_51_`. Footprint `Connector_Hirose_DF40:HIROSE_DF40TC_4.0_-30DS-0.4V_51_`. Every pin keeps the net it had: pin `n` on the receptacle carries the same net as pin `n` on the plug. **Do not re-permute the table.** The face-to-face mirror lives in the footprint geometry, which `check_interposer.py` already verifies.
 3. Add `C1` = 100 nF and `C2` = 1 µF, both `Device:C`, footprint `Capacitor_SMD:C_0402_1005Metric`, each wired VCC to GND.
 4. Annotate, then run ERC to zero errors.
+5. **Open Pcbnew and run Tools > Update PCB from Schematic (F8), accepting footprint changes.** `chip/chip.kicad_pcb` was copied from the carrier, so until this runs it still carries the *mirrored* BGA footprint and the DF40 *plug*. `tools/build_chip.py` in Task 5 flips whatever footprints it finds; if it runs first it will flip the wrong ones and Task 6's `"Mirrored" not in name` assertion will fail. `U1` and `J1` keep their positions through the update; `C1` and `C2` arrive unplaced and get positioned in Task 5 Step 3.
 
 - [ ] **Step 5: Register the project with the tooling**
 
