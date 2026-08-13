@@ -311,19 +311,52 @@ def check_chip():
     assert abs(mm(edge_box.GetWidth()) - 8.42) < 0.02, mm(edge_box.GetWidth())
     assert abs(mm(edge_box.GetHeight()) - 7.61) < 0.02, mm(edge_box.GetHeight())
 
+    # Board C deliberately uses via-in-pad, unlike every other board here.
+    # The NAND is reflowed onto these lands: a soldermask-plugged via is not
+    # flat enough to print a stencil against, and an untented one wicks solder
+    # out of the ball joint.  The process is JLCPCB "Epoxy Filled & Capped" --
+    # resin filled, baked, levelled, then copper plated over flat.
+    #
+    # NOT YET CONFIRMED FOR FOUR LAYERS.  JLC document this as the default at
+    # 6+ layers and do not list it as a standard 4-layer option.  Board C is
+    # 4-layer.  See the pre-order gate in docs/HANDOFF.md.
+    #
+    # Carrier A keeps the strict no-via-near-pad rule in check(); it neither
+    # needs via-in-pad nor should silently acquire it.
     for via in [t for t in board.GetTracks() if t.GetClass() == "PCB_VIA"]:
         assert via.GetViaType() == pcbnew.VIATYPE_THROUGH, (
             f"{via.GetNetname()} uses a non-through via"
         )
-        assert mm(via.GetDrillValue()) >= 0.20 - 1e-6, mm(via.GetDrillValue())
+        drill = mm(via.GetDrillValue())
+        land = mm(via.GetWidth(pcbnew.F_Cu))
+        assert 0.15 - 1e-6 <= drill <= 0.55 + 1e-6, (
+            f"{via.GetNetname()} drill {drill:.3f} mm is outside JLC's "
+            "0.15-0.55 mm fillable range"
+        )
+        assert (land - drill) / 2 >= 0.05 - 1e-6, (
+            f"{via.GetNetname()} annular ring {(land - drill) / 2:.3f} mm "
+            "is under the 0.05 mm minimum"
+        )
         for pad in interface.Pads():
             separation = (
                 (mm(via.GetPosition().x - pad.GetPosition().x) ** 2)
                 + (mm(via.GetPosition().y - pad.GetPosition().y) ** 2)
             ) ** 0.5
-            assert separation >= 0.35, (
-                f"{via.GetNetname()} via is in or too near U1 pad "
-                f"{pad.GetNumber()} ({separation:.3f} mm)"
+            pad_diameter = mm(pad.GetSizeX())
+            if separation >= pad_diameter / 2:
+                continue
+            # This via lands inside a ball pad.  Its copper must not stick out
+            # past the land: one oversized pad in a 67-ball field collapses to
+            # a different standoff than its neighbours and concentrates stress.
+            assert land <= pad_diameter + 1e-6, (
+                f"{via.GetNetname()} via land {land:.3f} mm is wider than ball "
+                f"{pad.GetNumber()}'s {pad_diameter:.3f} mm land, so it enlarges "
+                "that one pad and gives it a different standoff from the rest"
+            )
+            assert via.IsTented(pcbnew.F_Cu) and via.IsTented(pcbnew.B_Cu), (
+                f"{via.GetNetname()} via in ball {pad.GetNumber()} must be "
+                "tented on both sides; filled-and-capped vias must have no "
+                "soldermask opening on either face"
             )
 
 

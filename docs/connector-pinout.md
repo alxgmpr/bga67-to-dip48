@@ -97,5 +97,14 @@ hardware: https://github.com/courk/Nandbug-Hardware
 ## Manufacturing topology
 
 The carrier escape is deliberately conventional: 0.15 mm tracks and 0.45/0.20 mm ordinary
-through-via dogbones. No BGA pad contains a via. There are no microvias, blind/buried vias,
-VIPPO, filled/capped vias, or other HDI requirements.
+through-via dogbones. No carrier BGA pad contains a via. There are no microvias or
+blind/buried vias on any board, and no HDI requirement.
+
+Board C differs, on purpose. It carries the real NAND, reflowed onto its own lands, so it
+uses via-in-pad with JLCPCB's Epoxy Filled & Capped process — resin filled, levelled, copper
+plated over flat. Drills must be 0.15–0.55 mm, vias must be tented on both faces, and an
+in-pad via's land must not be wider than the 0.40 mm ball land it sits in, or that one ball
+ends up with a different standoff from its 66 neighbours.
+
+Epoxy Filled & Capped is unconfirmed on 4-layer orders; see the pre-order gate in
+`docs/HANDOFF.md` before fabricating board C. Boards A, B and D remain free of it.

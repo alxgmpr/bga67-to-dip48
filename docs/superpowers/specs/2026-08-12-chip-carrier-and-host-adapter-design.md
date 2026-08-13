@@ -25,7 +25,12 @@ motherboard. The handoff rule says that path must never carry service load.
 
 - Generalizing the interface to other packages or programmers. See "Productization" below.
 - Any change to `tools/pinout.py`. The 30-pin table is invariant across all four boards.
-- HDI, microvia, blind/buried via, via-in-pad, or filled/capped via process on any board.
+- HDI, microvia, or blind/buried via on any board. Via-in-pad and filled/capped vias are
+  excluded on boards A, B and D. **Superseded for board C on 2026-08-13**: board C uses
+  via-in-pad with JLCPCB Epoxy Filled & Capped, because the NAND is reflowed onto its lands
+  and neither a soldermask-plugged via (not flat enough to stencil against) nor an untented
+  one (wicks solder from the ball joint) is acceptable there. Unconfirmed on 4 layers — see
+  the pre-order gate in `docs/HANDOFF.md`.
 
 ## Architecture
 

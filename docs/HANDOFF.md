@@ -25,8 +25,10 @@ NAND body or 3D model.
   30-pin DF40 plug on F.Cu.
 - Shape: compact routed rectangle derived from the Courk-style escape topology.
 - Escape: 0.15 mm traces and ordinary 0.45/0.20 mm through-via dogbones.
-- Fabrication: standard JLCPCB four-layer process; no HDI, microvia, blind/buried via,
-  via-in-pad, or filled/capped-via requirement.
+- Fabrication: standard JLCPCB four-layer process; no HDI, microvia, or blind/buried via on
+  any board. Boards A, B and D additionally require no via-in-pad and no filled/capped vias.
+  Board C is the exception and needs Epoxy Filled & Capped in-pad vias — see the pre-order
+  gate below.
 - Base: 27.78 × 61.38 mm socket board with two 1×24 SMT DIP socket strips and a 4.0 mm DF40
   receptacle.
 - Connector: the routed carrier table is canonical; plug `J1.n` mates receptacle `J1.n`.
@@ -49,7 +51,29 @@ NAND body or 3D model.
   panel script from safely replacing an open board.
 
 Do not send fabrication files until manual routing is complete and `make check` passes. The
-intended process does not require HDI or via-in-pad.
+intended process does not require HDI. Boards A, B and D do not require via-in-pad either.
+
+## Pre-order gate: board C via filling
+
+Board C puts vias inside its BGA lands on purpose. The NAND is reflowed onto those lands, so
+a soldermask-plugged via is not flat enough to print a stencil against, and an untented via
+wicks solder out of the ball joint. Board C therefore needs JLCPCB's **Epoxy Filled & Capped**
+process: resin filled, baked, levelled, copper plated over flat. Drill diameters must be
+0.15–0.55 mm and the vias must have no soldermask opening on either face.
+
+**This is unconfirmed for four layers.** JLCPCB document Epoxy Filled & Capped as the default
+at 6 layers and above; their published 4-layer capabilities list only soldermask plugging,
+which is the option ruled out for flatness. Board C is 4-layer.
+
+Before ordering board C:
+
+1. Confirm with JLCPCB that Epoxy Filled & Capped is available on a 4-layer order, and at
+   what price and lead time.
+2. If it is not, either move board C to a 6-layer stackup — its panel is already a separate
+   file, so only board C is affected — or route the in-pad vias back out to ordinary
+   dogbones as boards A, B and D do.
+3. Do not order board C as a plain 4-layer job and hope. A plugged-but-not-capped via under a
+   ball is the failure this whole choice exists to avoid.
 
 ## Mechanical rule
 

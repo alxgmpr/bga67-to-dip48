@@ -40,6 +40,9 @@ Board A follows the useful parts of Courk's original NandBug routing topology:
 - ordinary 0.45 mm vias with 0.20 mm finished drills;
 - no blind/buried vias, microvias, via-in-pad, fill/cap, or HDI process.
 
+That last point holds for boards A, B and D. **Board C is the deliberate exception** — see
+"Via-in-pad on board C" below.
+
 The manufacturing target is a standard JLCPCB four-layer stackup, 1.6 mm, ENIG.
 
 The 47 unused motherboard lands remain floating. `U1` is only a logical pin map and mirrored
@@ -49,6 +52,29 @@ graphics.
 The carrier and the base are both routed. Base DRC reports zero unconnected items and zero
 schematic parity issues; its remaining 20 warnings are all `text thickness out of range` on
 silkscreen and are cosmetic.
+
+## Via-in-pad on board C
+
+Board C is the only board that puts vias inside BGA lands. The NAND is reflowed onto those
+lands, which forces the choice:
+
+- a soldermask-plugged via is not flat enough to print a stencil against when reballing;
+- an untented via wicks solder out of the ball joint.
+
+So board C's in-pad vias use JLCPCB's **Epoxy Filled & Capped** process: resin filled, baked,
+levelled, then copper plated over to a flat surface. Via diameters must be 0.15–0.55 mm and
+the vias must carry no soldermask opening on either face.
+
+> **Pre-order gate.** JLCPCB document Epoxy Filled & Capped as the default at **6 layers and
+> above** and do not list it as a standard 4-layer option. Board C is 4-layer. Confirm with
+> JLCPCB that the process is available on a 4-layer order, and at what price, **before
+> fabricating board C**. If it is not, the options are moving board C to 6 layers or routing
+> the in-pad vias back out to dogbones.
+
+Boards A, B and D remain free of via-in-pad and are unaffected. `tools/check_interposer.py`
+still enforces the strict no-via-near-pad rule on carrier A, and enforces the fill-process
+rules on board C: fillable drill range, minimum annular ring, via land no wider than the ball
+land, and tenting on both faces.
 
 ## Mechanical load path
 
@@ -67,5 +93,10 @@ make panel
 ```
 
 `tools/pinout.py` is the connector source of truth. `tools/check_interposer.py` guards the
-chipless mirrored footprint, cross outline, same-number DF40 contract, ordinary through-via dogbones,
-and absence of via-in-pad/HDI topology.
+chipless mirrored footprint, cross outline, same-number DF40 contract, ordinary through-via
+dogbones, and absence of via-in-pad/HDI topology on carrier A. On board C, where via-in-pad is
+intended, it instead enforces the Epoxy Filled & Capped rules: 0.15–0.55 mm fillable drills,
+0.05 mm minimum annular ring, via land no wider than the ball land, and tenting on both faces.
+
+`tools/bga_fit.py` checks BGA handedness: it fits a placed pad set against the normal land
+pattern allowing rotation and translation only, and fails when the better fit is a reflection.
