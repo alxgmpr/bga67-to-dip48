@@ -21,28 +21,31 @@ NAND body or 3D model.
 
 ## Current design direction
 
-- Carrier: nominal 10.2 × 7.6 mm notched cross, four layers, mirrored lands on B.Cu and
+- Carrier: nominal 8.41 × 7.60 mm outline, four layers, mirrored lands on B.Cu and
   30-pin DF40 plug on F.Cu.
-- Shape: Courk rev-3 cross rotated 90 degrees, with the center widened 0.9 mm for the larger
-  DF40 connector.
+- Shape: compact routed rectangle derived from the Courk-style escape topology.
 - Escape: 0.15 mm traces and ordinary 0.45/0.20 mm through-via dogbones.
 - Fabrication: standard JLCPCB four-layer process; no HDI, microvia, blind/buried via,
   via-in-pad, or filled/capped-via requirement.
-- Base: 30 × 90 mm socket board with two 1×24 SMT DIP socket strips and a 4.0 mm DF40
+- Base: 27.78 × 61.38 mm socket board with two 1×24 SMT DIP socket strips and a 4.0 mm DF40
   receptacle.
-- Connector: Courk's ten DF17 pin pairs occupy DF40 pins 7–26; all surplus contacts are GND.
-- Placement: carrier J1 and U1 are exactly concentric at the cross center; base J1 is exactly
-  centered on the base outline.
+- Connector: the routed carrier table is canonical; plug `J1.n` mates receptacle `J1.n`.
+- Placement: routed carrier J1 is 0.173 mm from U1 at the cross center (within the checked
+  0.20 mm escape allowance); base J1 is exactly centered on the base outline.
 - DF40 plug footprint: includes all four non-electrical MT retention lands and the downloaded
   STEP model with its verified `(-3.275, -1.355, 0)` origin correction.
 
 ## Current validation status
 
-- Carrier and base PCBs are intentionally unrouted for manual routing. Both contain zero
-  tracks, zero vias, and zero copper zones.
-- Carrier outline, connector pinout, mirrored footprint, and concentric placement checks pass.
-- Both schematic J1 connector blocks still need to be redrawn to match the new Courk-ordered
-  PCB pinout. ERC alone cannot detect that board/schematic contract drift.
+- The carrier is routed and its PCB/schematic J1 table is the preserved source topology.
+- The base PCB and schematic now use that identical J1 table. Signal routing on the base is
+  intentionally incomplete after removing routes that terminated at the old permutation.
+- Carrier outline, connector pinout, mirrored footprint, and placement checks pass.
+- The base has manufacturer-dimensioned SSM-124-L-SV lands, a combined two-strip STEP model,
+  and Hirose's exact DF40TC(4.0) receptacle STEP model.
+- Electrical and mechanical mating checks pass, as do ERC and carrier DRC. Base DRC has no
+  geometry/clearance violations after refilling zones, but reports 34 unconnected items; the
+  base is therefore not fabrication-ready.
 - Carrier panel: regenerate after closing the KiCad project; the current lock prevents the
   panel script from safely replacing an open board.
 

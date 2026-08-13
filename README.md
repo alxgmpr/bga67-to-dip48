@@ -24,31 +24,29 @@ the Google motherboard; it has no NAND package and no sacrificial memory.
 
 | Board | Contents | Nominal size |
 |---|---|---:|
-| `carrier/` | mirrored VFBGA67 motherboard lands + DF40 plug | 10.2 × 7.6 mm cross |
-| `base/` | DIP48 socket for XGecu adapter + DF40 receptacle + passives | 30 × 90 mm |
+| `carrier/` | mirrored VFBGA67 motherboard lands + DF40 plug | 8.41 × 7.60 mm |
+| `base/` | DIP48 socket for XGecu adapter + DF40 receptacle + passives | 27.78 × 61.38 mm |
 
-## Courk-style carrier
+## Compact routed carrier
 
-Board A now follows the useful parts of Courk's original NandBug topology:
+Board A follows the useful parts of Courk's original NandBug routing topology:
 
-- a notched cross outline, rotated to suit this assembly;
-- top-side DF40 and bottom-side mirrored VFBGA67 field exactly concentric;
-- Courk's DF17 pair ordering preserved in the middle 20 contacts of the 30-pin DF40;
+- the current compact 8.41 × 7.60 mm outline;
+- top-side DF40 within 0.20 mm of the bottom-side mirrored VFBGA67 field centre;
+- the completed carrier routing preserved as the canonical DF40 electrical order;
 - one short diagonal dogbone from each used VFBGA67 land;
 - ordinary 0.45 mm vias with 0.20 mm finished drills;
 - no blind/buried vias, microvias, via-in-pad, fill/cap, or HDI process.
 
-Courk's exact rotated outline is about 10.2 × 6.7 mm. This carrier retains its 10.2 mm
-length and notch proportions but widens the center to 7.6 mm because the 30-pin DF40 is
-larger than Courk's 20-pin DF17. The manufacturing target is a standard JLCPCB four-layer
-stackup, 1.6 mm, ENIG.
+The manufacturing target is a standard JLCPCB four-layer stackup, 1.6 mm, ENIG.
 
 The 47 unused motherboard lands remain floating. `U1` is only a logical pin map and mirrored
 land interface; it is excluded from BOM/position output and has no NAND model or package
 graphics.
 
-Both PCB files are intentionally unrouted so the final copper can be placed by hand in
-KiCad. The stored boards contain no tracks, vias, or copper zones.
+The carrier is routed. The base still needs its signal reroute after correcting the former
+double-mirrored connector table; do not fabricate it until DRC reports zero unconnected
+items.
 
 ## Mechanical load path
 
@@ -67,5 +65,5 @@ make panel
 ```
 
 `tools/pinout.py` is the connector source of truth. `tools/check_interposer.py` guards the
-chipless mirrored footprint, cross outline, Courk ordering, ordinary through-via dogbones,
+chipless mirrored footprint, cross outline, same-number DF40 contract, ordinary through-via dogbones,
 and absence of via-in-pad/HDI topology.

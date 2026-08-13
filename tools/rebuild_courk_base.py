@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prepare board B for the Courk-ordered DF40 reroute."""
+"""Prepare board B for a reroute using the canonical same-number DF40 table."""
 
 from pathlib import Path
 
@@ -38,7 +38,7 @@ def main():
         board.Remove(zone)
 
     pcbnew.SaveBoard(str(BOARD), board)
-    print("base prepared: centred Courk-ordered DF40, all routing removed")
+    print("base prepared: centred canonical DF40, all routing removed")
 
 
 if __name__ == "__main__":

@@ -42,7 +42,11 @@ those as a single global number.
 | SMD pad to SMD pad | 0.15 mm | Traces, different nets |
 | Pad to silkscreen | 0.15 mm | Legend |
 | Min text height / line | 1.00 / 0.15 mm | Legend |
-| Soldermask expansion | 1:1 (0) | Soldermask |
+| Soldermask expansion | 1:1 target; 0.005 mm KiCad numerical floor | Soldermask |
+
+The shared 0.005 mm board value is KiCad's practical near-zero setting, copied from the
+carrier so mask-related DRC behaves identically in every project. It does not represent a
+different fabrication capability; footprint-specific mask expansions still take precedence.
 
 The BGA-specific 4-layer rules from JLCPCB's *BGA Design Guidelines* are also
 enforced for the mirrored VFBGA67 land footprint:
@@ -77,29 +81,48 @@ anyone shrinks them.
 
 ## Panel
 
-`tools/panelize.sh` carries the mouse-bite geometry, also from the capabilities page:
+The production panel follows JLC's
+[panelization help](https://jlcpcb.com/help/article/pcb-panelization) and
+[panelization guide](https://jlcpcb.com/blog/pcb-panelization):
 
-- mouse bite drill **0.5 mm** — JLC's minimum NPTH and the floor of the 0.5–0.8 mm
-  recommended bite range. The previous 0.45 mm was below the NPTH minimum.
-- bite spacing **0.75 mm** — 0.5 mm drill + 0.25 mm gap, inside the recommended 0.2–0.3.
-- frame width **5 mm** — *"the minimum width of breakaway tab is 4 mm. For breakaway with
-  mouse-bites, the minimum width is 5 mm."* The previous 3 mm frame met only the plain
-  tooling-edge minimum, not the mouse-bite one.
-- board spacing 2 mm, four 1.5 mm tooling holes — both at spec.
+- **5 × 5 carriers**, **85 × 72 mm** overall. This clears JLC's 70 × 70 mm
+  minimum for a V-cut panel.
+- **5 mm perimeter rails** and **6 mm solid internal spacer strips**. Each
+  carrier is bounded by two straight horizontal and two straight vertical
+  scores; the 6 mm waste strips are also removed by V-cut.
+- **20 full-panel score lines**: ten vertical and ten horizontal. Parallel
+  lines are never closer than 6 mm, comfortably above JLC's 2 mm minimum.
+- **100 NPTH obround corner-relief slots**, 2.2 × 1.2 mm, centered where the
+  carrier's four score lines meet. They reproduce the carrier's shallow corner
+  ears after separation. These are real routed drill features, not graphics.
+- **0.30 mm minimum copper clearance** from both the score grid and relief
+  slots. The postprocessor carves 0.31 mm from saved zone fills so rounding
+  cannot put copper below the rule; tracks and pads are checked separately by
+  panel DRC.
+- **Three asymmetric 2 mm tooling holes** and **three asymmetric global
+  fiducial locations on both sides**, with 1 mm copper and 2 mm soldermask
+  openings. The fiducials sit 3 mm inside the outside edge and clear the relief
+  slots.
 
-kikit treats bite `spacing` as a maximum and then divides each cut evenly, so the realised
-pitch comes out tighter than requested — 0.75 mm asked for lands as low as 0.667 mm, and
-tab junctions emit two bites within 0.13 mm of each other. `tools/panel_fixups.py` culls
-afterwards rather than hunting for a spacing value whose rounding happens to work.
-
-It also drops the board's arc-approximation error to 0.001 mm. kikit's `millradius`
-corners are arcs; the zone filler polygonises them, and the chord sits inside the true arc
-far enough to report a 0.1995 mm edge clearance against a 0.2 mm rule. That is a faceting
-artifact of 0.5 µm, so the fix is the faceting — not loosening the rule or distorting the
-pour.
+`tools/panelize.sh` is the recipe and `tools/panel_fixups.py` turns KiKit's
+placement into the score grid, relief slots, fiducial positions, and copper
+keepouts. `tools/check_panel.py` asserts all counts, dimensions, pitches, drill
+shapes, and score extents after every rebuild.
 
 ## Known gaps
 
+- **Get JLC CAM approval for the corner-relief method.** JLC's public guidance
+  requires straight full-length score lines but does not explicitly say that a
+  score may cross an obround routed slot. Select **Confirm Production File =
+  Yes** and approve only a CAM preview that shows all 20 V-cuts continuing
+  through the 100 relief-slot centers.
+- **The guide's conservative 1 mm copper-to-V-cut recommendation is not met.**
+  The panel enforces 0.30 mm, which is compatible with JLC's tighter production
+  guidance and is DRC-clean, but reaching 1 mm would require rerouting the
+  compact carrier.
+- **The future second board is not included.** A mixed-board panel should be
+  considered only after that board exists and its stackup, thickness, copper
+  weight, surface finish, and assembly process match this carrier panel.
 - **Same-net track spacing 0.25 mm** is a JLC limit with no KiCad DRC equivalent. Not
   checked. It matters where a track doubles back on itself; neither board does.
 - **Min SMD pad 0.25 × 0.25 mm.** The DF40 land pattern is 0.2 × 0.7 mm, narrower than

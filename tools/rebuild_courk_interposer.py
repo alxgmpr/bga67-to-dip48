@@ -30,9 +30,7 @@ def set_connector_pinout(board):
     # Keep the top-side connector concentric with the bottom-side motherboard
     # land field.  Routing is intentionally left entirely to the PCB editor.
     connector.SetPosition(interface.GetPosition())
-    # Rotate the Courk pin sequence with the board's 90-degree U1 placement.
-    # Without this half-turn the IO cluster and control cluster cross over one
-    # another before reaching their respective halves of the BGA field.
+    # Preserve the routed carrier orientation and canonical pin sequence.
     connector.SetOrientationDegrees(180)
     nets = board.GetNetsByName()
     for pad in connector.Pads():

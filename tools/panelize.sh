@@ -20,20 +20,13 @@ KICAD_PY="${KICAD_PY:-/Applications/KiCad/KiCad.app/Contents/Frameworks/Python.f
 
 # ---------------------------------------------------------------- parameters
 # Keep every tunable here, named, so a change is a one-line diff.
-ROWS=4
-COLS=4
-SPACE=2mm          # gap between boards
-TAB_WIDTH=3mm      # mouse-bite tab width
-TAB_V=2            # tabs per vertical edge
-TAB_H=1            # tabs per horizontal edge
-MB_DRILL=0.5mm     # JLC: min NPTH 0.5, mouse bites recommended 0.5-0.8
-MB_SPACING=0.75mm  # JLC: 0.2-0.3 between bites -> 0.5 + 0.25
-MB_OFFSET=-0.3mm   # NEGATIVE. see the note at the bottom of this file
-MB_PROLONG=0.5mm
-FRAME_WIDTH=5mm    # JLC: breakaway with mouse-bites, minimum width 5mm
-FRAME_SPACE=2mm
-TOOLING_SIZE=1.5mm
-MILL_RADIUS=1mm
+ROWS=5
+COLS=5
+SPACE=6mm          # solid sacrificial FR-4 strips, scored on both edges
+FRAME_WIDTH=5mm    # perimeter process rails
+TOOLING_SIZE=2mm   # JLC assembly guide: tooling holes are typically 2-4 mm
+FID_COPPER=1mm
+FID_OPENING=2mm
 
 step() { printf '\n\033[1m==> %s\033[0m\n' "$*"; }
 die()  { printf '\033[31merror: %s\033[0m\n' "$*" >&2; exit 1; }
@@ -76,11 +69,12 @@ step "Panelizing ${ROWS}x${COLS}"
 rm -f "$OUT" "${OUT%.kicad_pcb}.kicad_pro" "${OUT%.kicad_pcb}.kicad_prl"
 kikit panelize \
 	--layout  "grid; rows: $ROWS; cols: $COLS; space: $SPACE" \
-	--tabs    "fixed; width: $TAB_WIDTH; vcount: $TAB_V; hcount: $TAB_H" \
-	--cuts    "mousebites; drill: $MB_DRILL; spacing: $MB_SPACING; offset: $MB_OFFSET; prolong: $MB_PROLONG" \
-	--framing "frame; width: $FRAME_WIDTH; space: $FRAME_SPACE; cuts: both" \
-	--tooling "4hole; hoffset: 1.5mm; voffset: 1.5mm; size: $TOOLING_SIZE" \
-	--post    "millradius: $MILL_RADIUS" \
+	--tabs    "none" \
+	--cuts    "none" \
+	--framing "frame; width: $FRAME_WIDTH; space: 0mm; cuts: none" \
+	--tooling "3hole; hoffset: 1.5mm; voffset: 1.5mm; size: $TOOLING_SIZE" \
+	--fiducials "3fid; hoffset: 4mm; voffset: 3.5mm; coppersize: $FID_COPPER; opening: $FID_OPENING" \
+	--post    "millradius: 0mm" \
 	"$SRC" "$OUT"
 
 # ------------------------------------------------------------- library table
@@ -99,6 +93,8 @@ EOF
 step "Fixups"
 "$KICAD_PY" "$ROOT/tools/panel_fixups.py" "$OUT" 2>/dev/null \
 	| grep -v "memory leak"
+"$KICAD_PY" "$ROOT/tools/check_panel.py" "$OUT" 2>/dev/null \
+	| grep -v "memory leak"
 
 # ------------------------------------------------------------------- verify
 step "Panel DRC"
@@ -114,13 +110,15 @@ c = Counter(v['type'] for v in d.get('violations', []))
 u = len(d.get('unconnected_items', []))
 
 # Not the panel's problem:
-#   lib_footprint_mismatch  kikit rewrites footprints into the panel by value
+#   lib_footprint_*         kikit rewrites footprints into the panel by value
 #   silk_*, text_*          inherited from the carrier, cosmetic, and the
 #                           carrier's own DRC already reports them once each
-#   unconnected_items       the carrier is intentionally handed off unrouted
-#                           instead of sixteen times
-SOFT = ('lib_footprint_mismatch', 'silk_overlap', 'silk_edge_clearance',
-        'silk_over_copper', 'text_height', 'text_thickness')
+#   *_outline               the 20 intentional open Edge.Cuts lines are the
+#                           full-length JLC V-score specification
+SOFT = ('lib_footprint_mismatch', 'lib_footprint_issues',
+        'silk_overlap', 'silk_edge_clearance',
+        'silk_over_copper', 'text_height', 'text_thickness',
+        'malformed_outline', 'invalid_outline')
 
 hard = {t: n for t, n in c.items() if t not in SOFT}
 soft = {t: n for t, n in c.items() if t in SOFT}
@@ -145,14 +143,5 @@ for m in re.finditer(r'\(gr_line\s+\(start ([-\d.]+) ([-\d.]+)\)\s*\(end ([-\d.]
 if xs:
 	print('%.2f x %.2f mm' % (max(xs) - min(xs), max(ys) - min(ys)))
 print('%d boards' % t.count('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer"'))
-print('%d mouse bites' % t.count('(footprint "NPTH"'))
+print('%d V-cut relief slots' % len(re.findall(r'\(property "Reference" "VCUT_RELIEF_', t)))
 EOF
-
-# ---------------------------------------------------------------------------
-# Why MB_OFFSET is negative
-#
-# kikit's default offset puts the mouse-bite holes inside the board edge. On a
-# compact carrier that lands them 0.17 mm from signal copper, under
-# JLCPCB's 0.2 mm hole-to-track minimum -- 812 violations. At -0.3 mm the bites
-# sit in the waste and DRC is clean. Do not "fix" the sign.
-# ---------------------------------------------------------------------------

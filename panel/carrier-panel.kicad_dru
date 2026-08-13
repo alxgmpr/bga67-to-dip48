@@ -1,5 +1,27 @@
 (version 1)
 
+(rule "Board_0-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_0-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_0-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
 (rule "Board_0-JLC SMD pad to SMD pad 0.15mm"
 	(constraint clearance (min 0.15mm))
 	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
@@ -79,6 +101,28 @@
 	(severity warning)
 	(constraint via_diameter (min 0.45mm))
 	(condition "A.Type == 'Via'"))
+(rule "Board_1-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_1-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_1-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
 (rule "Board_1-JLC SMD pad to SMD pad 0.15mm"
 	(constraint clearance (min 0.15mm))
 	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
@@ -158,6 +202,28 @@
 	(severity warning)
 	(constraint via_diameter (min 0.45mm))
 	(condition "A.Type == 'Via'"))
+(rule "Board_2-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_2-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_2-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
 (rule "Board_2-JLC SMD pad to SMD pad 0.15mm"
 	(constraint clearance (min 0.15mm))
 	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
@@ -237,6 +303,28 @@
 	(severity warning)
 	(constraint via_diameter (min 0.45mm))
 	(condition "A.Type == 'Via'"))
+(rule "Board_3-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_3-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_3-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
 (rule "Board_3-JLC SMD pad to SMD pad 0.15mm"
 	(constraint clearance (min 0.15mm))
 	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
@@ -316,6 +404,28 @@
 	(severity warning)
 	(constraint via_diameter (min 0.45mm))
 	(condition "A.Type == 'Via'"))
+(rule "Board_4-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_4-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_4-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
 (rule "Board_4-JLC SMD pad to SMD pad 0.15mm"
 	(constraint clearance (min 0.15mm))
 	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
@@ -395,6 +505,28 @@
 	(severity warning)
 	(constraint via_diameter (min 0.45mm))
 	(condition "A.Type == 'Via'"))
+(rule "Board_5-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_5-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_5-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
 (rule "Board_5-JLC SMD pad to SMD pad 0.15mm"
 	(constraint clearance (min 0.15mm))
 	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
@@ -474,6 +606,28 @@
 	(severity warning)
 	(constraint via_diameter (min 0.45mm))
 	(condition "A.Type == 'Via'"))
+(rule "Board_6-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_6-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_6-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
 (rule "Board_6-JLC SMD pad to SMD pad 0.15mm"
 	(constraint clearance (min 0.15mm))
 	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
@@ -553,6 +707,28 @@
 	(severity warning)
 	(constraint via_diameter (min 0.45mm))
 	(condition "A.Type == 'Via'"))
+(rule "Board_7-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_7-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_7-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
 (rule "Board_7-JLC SMD pad to SMD pad 0.15mm"
 	(constraint clearance (min 0.15mm))
 	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
@@ -632,6 +808,28 @@
 	(severity warning)
 	(constraint via_diameter (min 0.45mm))
 	(condition "A.Type == 'Via'"))
+(rule "Board_8-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_8-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_8-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
 (rule "Board_8-JLC SMD pad to SMD pad 0.15mm"
 	(constraint clearance (min 0.15mm))
 	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
@@ -711,6 +909,28 @@
 	(severity warning)
 	(constraint via_diameter (min 0.45mm))
 	(condition "A.Type == 'Via'"))
+(rule "Board_9-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_9-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_9-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
 (rule "Board_9-JLC SMD pad to SMD pad 0.15mm"
 	(constraint clearance (min 0.15mm))
 	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
@@ -790,6 +1010,28 @@
 	(severity warning)
 	(constraint via_diameter (min 0.45mm))
 	(condition "A.Type == 'Via'"))
+(rule "Board_10-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_10-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_10-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
 (rule "Board_10-JLC SMD pad to SMD pad 0.15mm"
 	(constraint clearance (min 0.15mm))
 	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
@@ -869,6 +1111,28 @@
 	(severity warning)
 	(constraint via_diameter (min 0.45mm))
 	(condition "A.Type == 'Via'"))
+(rule "Board_11-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_11-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_11-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
 (rule "Board_11-JLC SMD pad to SMD pad 0.15mm"
 	(constraint clearance (min 0.15mm))
 	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
@@ -948,6 +1212,28 @@
 	(severity warning)
 	(constraint via_diameter (min 0.45mm))
 	(condition "A.Type == 'Via'"))
+(rule "Board_12-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_12-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_12-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
 (rule "Board_12-JLC SMD pad to SMD pad 0.15mm"
 	(constraint clearance (min 0.15mm))
 	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
@@ -1027,6 +1313,28 @@
 	(severity warning)
 	(constraint via_diameter (min 0.45mm))
 	(condition "A.Type == 'Via'"))
+(rule "Board_13-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_13-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_13-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
 (rule "Board_13-JLC SMD pad to SMD pad 0.15mm"
 	(constraint clearance (min 0.15mm))
 	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
@@ -1106,6 +1414,28 @@
 	(severity warning)
 	(constraint via_diameter (min 0.45mm))
 	(condition "A.Type == 'Via'"))
+(rule "Board_14-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_14-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_14-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
 (rule "Board_14-JLC SMD pad to SMD pad 0.15mm"
 	(constraint clearance (min 0.15mm))
 	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
@@ -1185,6 +1515,28 @@
 	(severity warning)
 	(constraint via_diameter (min 0.45mm))
 	(condition "A.Type == 'Via'"))
+(rule "Board_15-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_15-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_15-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
 (rule "Board_15-JLC SMD pad to SMD pad 0.15mm"
 	(constraint clearance (min 0.15mm))
 	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
@@ -1261,6 +1613,915 @@
 # 0.45mm, will cost more."  Our vias are 0.45/0.20, exactly on the free
 # boundary -- this fires if anyone shrinks a via pad below it.
 (rule "Board_15-JLC via below the free-tooling boundary (cost, not a defect)"
+	(severity warning)
+	(constraint via_diameter (min 0.45mm))
+	(condition "A.Type == 'Via'"))
+(rule "Board_16-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_16-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_16-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
+(rule "Board_16-JLC SMD pad to SMD pad 0.15mm"
+	(constraint clearance (min 0.15mm))
+	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
+
+# "Via hole to Track: 0.2mm"
+(rule "Board_16-JLC via hole to track 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Type == 'Track'"))
+
+# "PTH to Track: 0.28mm" (0.35 mm recommended)
+(rule "Board_16-JLC PTH hole to track 0.28mm"
+	(constraint hole_clearance (min 0.28mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Type == 'Track'"))
+
+# "NPTH to Track: 0.2mm"
+(rule "Board_16-JLC NPTH hole to track 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical' && B.Type == 'Track'"))
+
+# "Inner layer via hole to copper clearance: 0.2mm"
+(rule "Board_16-JLC inner-layer via hole to copper 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Layer == 'In1.Cu'"))
+
+(rule "Board_16-JLC inner-layer via hole to copper 0.2mm (In2)"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Layer == 'In2.Cu'"))
+
+# "Inner layer PTH pad hole to copper clearance: 0.3mm"
+(rule "Board_16-JLC inner-layer PTH hole to copper 0.3mm"
+	(constraint hole_clearance (min 0.3mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Layer == 'In1.Cu'"))
+
+(rule "Board_16-JLC inner-layer PTH hole to copper 0.3mm (In2)"
+	(constraint hole_clearance (min 0.3mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Layer == 'In2.Cu'"))
+
+# ----------------------------------------------------------------- Drilling
+
+# "Pad Hole-to-Hole Spacing: 0.45mm".  Plated pads only -- mouse bites are
+# NPTH and JLC specifies them separately (see below), so scoping this to
+# 'Through-hole' keeps a panel from tripping a rule that does not apply to it.
+(rule "Board_16-JLC PTH hole to PTH hole 0.45mm"
+	(constraint hole_to_hole (min 0.45mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Pad_Type == 'Through-hole'"))
+
+# "Via Hole-to-Hole Spacing: 0.2mm"
+(rule "Board_16-JLC via hole to via hole 0.2mm"
+	(constraint hole_to_hole (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Type == 'Via'"))
+
+# "Min. Non-plated holes: 0.50mm".  Also the floor of the 0.5-0.8 mm range
+# JLC recommends for mouse bites, which is why tools/panelize.sh drills 0.5.
+(rule "Board_16-JLC minimum NPTH 0.5mm"
+	(constraint hole_size (min 0.5mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical'"))
+
+# "Mouse bites Panel: recommended distance between the two mouse-bites is
+# 0.2-0.3mm."  NPTH-to-NPTH only; the 0.45 mm pad rule above does not apply.
+(rule "Board_16-JLC mouse-bite hole spacing 0.2mm"
+	(constraint hole_to_hole (min 0.2mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical' && B.Pad_Type == 'NPTH, mechanical'"))
+
+# "PTH annular ring: multilayer 1 oz recommended 0.20mm or above, absolute
+# minimum 0.15mm."  KiCad's global min_via_annular_width covers vias only.
+(rule "Board_16-JLC PTH annular ring 0.15mm"
+	(constraint annular_width (min 0.15mm))
+	(condition "A.Pad_Type == 'Through-hole'"))
+
+# --------------------------------------------------------------------- Cost
+
+# Not a manufacturability limit.  "0.15mm hole size with any size via
+# diameter, and 0.2mm or 0.25mm hole size with via diameter less than
+# 0.45mm, will cost more."  Our vias are 0.45/0.20, exactly on the free
+# boundary -- this fires if anyone shrinks a via pad below it.
+(rule "Board_16-JLC via below the free-tooling boundary (cost, not a defect)"
+	(severity warning)
+	(constraint via_diameter (min 0.45mm))
+	(condition "A.Type == 'Via'"))
+(rule "Board_17-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_17-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_17-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
+(rule "Board_17-JLC SMD pad to SMD pad 0.15mm"
+	(constraint clearance (min 0.15mm))
+	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
+
+# "Via hole to Track: 0.2mm"
+(rule "Board_17-JLC via hole to track 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Type == 'Track'"))
+
+# "PTH to Track: 0.28mm" (0.35 mm recommended)
+(rule "Board_17-JLC PTH hole to track 0.28mm"
+	(constraint hole_clearance (min 0.28mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Type == 'Track'"))
+
+# "NPTH to Track: 0.2mm"
+(rule "Board_17-JLC NPTH hole to track 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical' && B.Type == 'Track'"))
+
+# "Inner layer via hole to copper clearance: 0.2mm"
+(rule "Board_17-JLC inner-layer via hole to copper 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Layer == 'In1.Cu'"))
+
+(rule "Board_17-JLC inner-layer via hole to copper 0.2mm (In2)"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Layer == 'In2.Cu'"))
+
+# "Inner layer PTH pad hole to copper clearance: 0.3mm"
+(rule "Board_17-JLC inner-layer PTH hole to copper 0.3mm"
+	(constraint hole_clearance (min 0.3mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Layer == 'In1.Cu'"))
+
+(rule "Board_17-JLC inner-layer PTH hole to copper 0.3mm (In2)"
+	(constraint hole_clearance (min 0.3mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Layer == 'In2.Cu'"))
+
+# ----------------------------------------------------------------- Drilling
+
+# "Pad Hole-to-Hole Spacing: 0.45mm".  Plated pads only -- mouse bites are
+# NPTH and JLC specifies them separately (see below), so scoping this to
+# 'Through-hole' keeps a panel from tripping a rule that does not apply to it.
+(rule "Board_17-JLC PTH hole to PTH hole 0.45mm"
+	(constraint hole_to_hole (min 0.45mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Pad_Type == 'Through-hole'"))
+
+# "Via Hole-to-Hole Spacing: 0.2mm"
+(rule "Board_17-JLC via hole to via hole 0.2mm"
+	(constraint hole_to_hole (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Type == 'Via'"))
+
+# "Min. Non-plated holes: 0.50mm".  Also the floor of the 0.5-0.8 mm range
+# JLC recommends for mouse bites, which is why tools/panelize.sh drills 0.5.
+(rule "Board_17-JLC minimum NPTH 0.5mm"
+	(constraint hole_size (min 0.5mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical'"))
+
+# "Mouse bites Panel: recommended distance between the two mouse-bites is
+# 0.2-0.3mm."  NPTH-to-NPTH only; the 0.45 mm pad rule above does not apply.
+(rule "Board_17-JLC mouse-bite hole spacing 0.2mm"
+	(constraint hole_to_hole (min 0.2mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical' && B.Pad_Type == 'NPTH, mechanical'"))
+
+# "PTH annular ring: multilayer 1 oz recommended 0.20mm or above, absolute
+# minimum 0.15mm."  KiCad's global min_via_annular_width covers vias only.
+(rule "Board_17-JLC PTH annular ring 0.15mm"
+	(constraint annular_width (min 0.15mm))
+	(condition "A.Pad_Type == 'Through-hole'"))
+
+# --------------------------------------------------------------------- Cost
+
+# Not a manufacturability limit.  "0.15mm hole size with any size via
+# diameter, and 0.2mm or 0.25mm hole size with via diameter less than
+# 0.45mm, will cost more."  Our vias are 0.45/0.20, exactly on the free
+# boundary -- this fires if anyone shrinks a via pad below it.
+(rule "Board_17-JLC via below the free-tooling boundary (cost, not a defect)"
+	(severity warning)
+	(constraint via_diameter (min 0.45mm))
+	(condition "A.Type == 'Via'"))
+(rule "Board_18-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_18-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_18-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
+(rule "Board_18-JLC SMD pad to SMD pad 0.15mm"
+	(constraint clearance (min 0.15mm))
+	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
+
+# "Via hole to Track: 0.2mm"
+(rule "Board_18-JLC via hole to track 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Type == 'Track'"))
+
+# "PTH to Track: 0.28mm" (0.35 mm recommended)
+(rule "Board_18-JLC PTH hole to track 0.28mm"
+	(constraint hole_clearance (min 0.28mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Type == 'Track'"))
+
+# "NPTH to Track: 0.2mm"
+(rule "Board_18-JLC NPTH hole to track 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical' && B.Type == 'Track'"))
+
+# "Inner layer via hole to copper clearance: 0.2mm"
+(rule "Board_18-JLC inner-layer via hole to copper 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Layer == 'In1.Cu'"))
+
+(rule "Board_18-JLC inner-layer via hole to copper 0.2mm (In2)"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Layer == 'In2.Cu'"))
+
+# "Inner layer PTH pad hole to copper clearance: 0.3mm"
+(rule "Board_18-JLC inner-layer PTH hole to copper 0.3mm"
+	(constraint hole_clearance (min 0.3mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Layer == 'In1.Cu'"))
+
+(rule "Board_18-JLC inner-layer PTH hole to copper 0.3mm (In2)"
+	(constraint hole_clearance (min 0.3mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Layer == 'In2.Cu'"))
+
+# ----------------------------------------------------------------- Drilling
+
+# "Pad Hole-to-Hole Spacing: 0.45mm".  Plated pads only -- mouse bites are
+# NPTH and JLC specifies them separately (see below), so scoping this to
+# 'Through-hole' keeps a panel from tripping a rule that does not apply to it.
+(rule "Board_18-JLC PTH hole to PTH hole 0.45mm"
+	(constraint hole_to_hole (min 0.45mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Pad_Type == 'Through-hole'"))
+
+# "Via Hole-to-Hole Spacing: 0.2mm"
+(rule "Board_18-JLC via hole to via hole 0.2mm"
+	(constraint hole_to_hole (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Type == 'Via'"))
+
+# "Min. Non-plated holes: 0.50mm".  Also the floor of the 0.5-0.8 mm range
+# JLC recommends for mouse bites, which is why tools/panelize.sh drills 0.5.
+(rule "Board_18-JLC minimum NPTH 0.5mm"
+	(constraint hole_size (min 0.5mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical'"))
+
+# "Mouse bites Panel: recommended distance between the two mouse-bites is
+# 0.2-0.3mm."  NPTH-to-NPTH only; the 0.45 mm pad rule above does not apply.
+(rule "Board_18-JLC mouse-bite hole spacing 0.2mm"
+	(constraint hole_to_hole (min 0.2mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical' && B.Pad_Type == 'NPTH, mechanical'"))
+
+# "PTH annular ring: multilayer 1 oz recommended 0.20mm or above, absolute
+# minimum 0.15mm."  KiCad's global min_via_annular_width covers vias only.
+(rule "Board_18-JLC PTH annular ring 0.15mm"
+	(constraint annular_width (min 0.15mm))
+	(condition "A.Pad_Type == 'Through-hole'"))
+
+# --------------------------------------------------------------------- Cost
+
+# Not a manufacturability limit.  "0.15mm hole size with any size via
+# diameter, and 0.2mm or 0.25mm hole size with via diameter less than
+# 0.45mm, will cost more."  Our vias are 0.45/0.20, exactly on the free
+# boundary -- this fires if anyone shrinks a via pad below it.
+(rule "Board_18-JLC via below the free-tooling boundary (cost, not a defect)"
+	(severity warning)
+	(constraint via_diameter (min 0.45mm))
+	(condition "A.Type == 'Via'"))
+(rule "Board_19-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_19-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_19-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
+(rule "Board_19-JLC SMD pad to SMD pad 0.15mm"
+	(constraint clearance (min 0.15mm))
+	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
+
+# "Via hole to Track: 0.2mm"
+(rule "Board_19-JLC via hole to track 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Type == 'Track'"))
+
+# "PTH to Track: 0.28mm" (0.35 mm recommended)
+(rule "Board_19-JLC PTH hole to track 0.28mm"
+	(constraint hole_clearance (min 0.28mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Type == 'Track'"))
+
+# "NPTH to Track: 0.2mm"
+(rule "Board_19-JLC NPTH hole to track 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical' && B.Type == 'Track'"))
+
+# "Inner layer via hole to copper clearance: 0.2mm"
+(rule "Board_19-JLC inner-layer via hole to copper 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Layer == 'In1.Cu'"))
+
+(rule "Board_19-JLC inner-layer via hole to copper 0.2mm (In2)"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Layer == 'In2.Cu'"))
+
+# "Inner layer PTH pad hole to copper clearance: 0.3mm"
+(rule "Board_19-JLC inner-layer PTH hole to copper 0.3mm"
+	(constraint hole_clearance (min 0.3mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Layer == 'In1.Cu'"))
+
+(rule "Board_19-JLC inner-layer PTH hole to copper 0.3mm (In2)"
+	(constraint hole_clearance (min 0.3mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Layer == 'In2.Cu'"))
+
+# ----------------------------------------------------------------- Drilling
+
+# "Pad Hole-to-Hole Spacing: 0.45mm".  Plated pads only -- mouse bites are
+# NPTH and JLC specifies them separately (see below), so scoping this to
+# 'Through-hole' keeps a panel from tripping a rule that does not apply to it.
+(rule "Board_19-JLC PTH hole to PTH hole 0.45mm"
+	(constraint hole_to_hole (min 0.45mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Pad_Type == 'Through-hole'"))
+
+# "Via Hole-to-Hole Spacing: 0.2mm"
+(rule "Board_19-JLC via hole to via hole 0.2mm"
+	(constraint hole_to_hole (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Type == 'Via'"))
+
+# "Min. Non-plated holes: 0.50mm".  Also the floor of the 0.5-0.8 mm range
+# JLC recommends for mouse bites, which is why tools/panelize.sh drills 0.5.
+(rule "Board_19-JLC minimum NPTH 0.5mm"
+	(constraint hole_size (min 0.5mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical'"))
+
+# "Mouse bites Panel: recommended distance between the two mouse-bites is
+# 0.2-0.3mm."  NPTH-to-NPTH only; the 0.45 mm pad rule above does not apply.
+(rule "Board_19-JLC mouse-bite hole spacing 0.2mm"
+	(constraint hole_to_hole (min 0.2mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical' && B.Pad_Type == 'NPTH, mechanical'"))
+
+# "PTH annular ring: multilayer 1 oz recommended 0.20mm or above, absolute
+# minimum 0.15mm."  KiCad's global min_via_annular_width covers vias only.
+(rule "Board_19-JLC PTH annular ring 0.15mm"
+	(constraint annular_width (min 0.15mm))
+	(condition "A.Pad_Type == 'Through-hole'"))
+
+# --------------------------------------------------------------------- Cost
+
+# Not a manufacturability limit.  "0.15mm hole size with any size via
+# diameter, and 0.2mm or 0.25mm hole size with via diameter less than
+# 0.45mm, will cost more."  Our vias are 0.45/0.20, exactly on the free
+# boundary -- this fires if anyone shrinks a via pad below it.
+(rule "Board_19-JLC via below the free-tooling boundary (cost, not a defect)"
+	(severity warning)
+	(constraint via_diameter (min 0.45mm))
+	(condition "A.Type == 'Via'"))
+(rule "Board_20-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_20-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_20-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
+(rule "Board_20-JLC SMD pad to SMD pad 0.15mm"
+	(constraint clearance (min 0.15mm))
+	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
+
+# "Via hole to Track: 0.2mm"
+(rule "Board_20-JLC via hole to track 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Type == 'Track'"))
+
+# "PTH to Track: 0.28mm" (0.35 mm recommended)
+(rule "Board_20-JLC PTH hole to track 0.28mm"
+	(constraint hole_clearance (min 0.28mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Type == 'Track'"))
+
+# "NPTH to Track: 0.2mm"
+(rule "Board_20-JLC NPTH hole to track 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical' && B.Type == 'Track'"))
+
+# "Inner layer via hole to copper clearance: 0.2mm"
+(rule "Board_20-JLC inner-layer via hole to copper 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Layer == 'In1.Cu'"))
+
+(rule "Board_20-JLC inner-layer via hole to copper 0.2mm (In2)"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Layer == 'In2.Cu'"))
+
+# "Inner layer PTH pad hole to copper clearance: 0.3mm"
+(rule "Board_20-JLC inner-layer PTH hole to copper 0.3mm"
+	(constraint hole_clearance (min 0.3mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Layer == 'In1.Cu'"))
+
+(rule "Board_20-JLC inner-layer PTH hole to copper 0.3mm (In2)"
+	(constraint hole_clearance (min 0.3mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Layer == 'In2.Cu'"))
+
+# ----------------------------------------------------------------- Drilling
+
+# "Pad Hole-to-Hole Spacing: 0.45mm".  Plated pads only -- mouse bites are
+# NPTH and JLC specifies them separately (see below), so scoping this to
+# 'Through-hole' keeps a panel from tripping a rule that does not apply to it.
+(rule "Board_20-JLC PTH hole to PTH hole 0.45mm"
+	(constraint hole_to_hole (min 0.45mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Pad_Type == 'Through-hole'"))
+
+# "Via Hole-to-Hole Spacing: 0.2mm"
+(rule "Board_20-JLC via hole to via hole 0.2mm"
+	(constraint hole_to_hole (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Type == 'Via'"))
+
+# "Min. Non-plated holes: 0.50mm".  Also the floor of the 0.5-0.8 mm range
+# JLC recommends for mouse bites, which is why tools/panelize.sh drills 0.5.
+(rule "Board_20-JLC minimum NPTH 0.5mm"
+	(constraint hole_size (min 0.5mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical'"))
+
+# "Mouse bites Panel: recommended distance between the two mouse-bites is
+# 0.2-0.3mm."  NPTH-to-NPTH only; the 0.45 mm pad rule above does not apply.
+(rule "Board_20-JLC mouse-bite hole spacing 0.2mm"
+	(constraint hole_to_hole (min 0.2mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical' && B.Pad_Type == 'NPTH, mechanical'"))
+
+# "PTH annular ring: multilayer 1 oz recommended 0.20mm or above, absolute
+# minimum 0.15mm."  KiCad's global min_via_annular_width covers vias only.
+(rule "Board_20-JLC PTH annular ring 0.15mm"
+	(constraint annular_width (min 0.15mm))
+	(condition "A.Pad_Type == 'Through-hole'"))
+
+# --------------------------------------------------------------------- Cost
+
+# Not a manufacturability limit.  "0.15mm hole size with any size via
+# diameter, and 0.2mm or 0.25mm hole size with via diameter less than
+# 0.45mm, will cost more."  Our vias are 0.45/0.20, exactly on the free
+# boundary -- this fires if anyone shrinks a via pad below it.
+(rule "Board_20-JLC via below the free-tooling boundary (cost, not a defect)"
+	(severity warning)
+	(constraint via_diameter (min 0.45mm))
+	(condition "A.Type == 'Via'"))
+(rule "Board_21-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_21-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_21-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
+(rule "Board_21-JLC SMD pad to SMD pad 0.15mm"
+	(constraint clearance (min 0.15mm))
+	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
+
+# "Via hole to Track: 0.2mm"
+(rule "Board_21-JLC via hole to track 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Type == 'Track'"))
+
+# "PTH to Track: 0.28mm" (0.35 mm recommended)
+(rule "Board_21-JLC PTH hole to track 0.28mm"
+	(constraint hole_clearance (min 0.28mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Type == 'Track'"))
+
+# "NPTH to Track: 0.2mm"
+(rule "Board_21-JLC NPTH hole to track 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical' && B.Type == 'Track'"))
+
+# "Inner layer via hole to copper clearance: 0.2mm"
+(rule "Board_21-JLC inner-layer via hole to copper 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Layer == 'In1.Cu'"))
+
+(rule "Board_21-JLC inner-layer via hole to copper 0.2mm (In2)"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Layer == 'In2.Cu'"))
+
+# "Inner layer PTH pad hole to copper clearance: 0.3mm"
+(rule "Board_21-JLC inner-layer PTH hole to copper 0.3mm"
+	(constraint hole_clearance (min 0.3mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Layer == 'In1.Cu'"))
+
+(rule "Board_21-JLC inner-layer PTH hole to copper 0.3mm (In2)"
+	(constraint hole_clearance (min 0.3mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Layer == 'In2.Cu'"))
+
+# ----------------------------------------------------------------- Drilling
+
+# "Pad Hole-to-Hole Spacing: 0.45mm".  Plated pads only -- mouse bites are
+# NPTH and JLC specifies them separately (see below), so scoping this to
+# 'Through-hole' keeps a panel from tripping a rule that does not apply to it.
+(rule "Board_21-JLC PTH hole to PTH hole 0.45mm"
+	(constraint hole_to_hole (min 0.45mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Pad_Type == 'Through-hole'"))
+
+# "Via Hole-to-Hole Spacing: 0.2mm"
+(rule "Board_21-JLC via hole to via hole 0.2mm"
+	(constraint hole_to_hole (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Type == 'Via'"))
+
+# "Min. Non-plated holes: 0.50mm".  Also the floor of the 0.5-0.8 mm range
+# JLC recommends for mouse bites, which is why tools/panelize.sh drills 0.5.
+(rule "Board_21-JLC minimum NPTH 0.5mm"
+	(constraint hole_size (min 0.5mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical'"))
+
+# "Mouse bites Panel: recommended distance between the two mouse-bites is
+# 0.2-0.3mm."  NPTH-to-NPTH only; the 0.45 mm pad rule above does not apply.
+(rule "Board_21-JLC mouse-bite hole spacing 0.2mm"
+	(constraint hole_to_hole (min 0.2mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical' && B.Pad_Type == 'NPTH, mechanical'"))
+
+# "PTH annular ring: multilayer 1 oz recommended 0.20mm or above, absolute
+# minimum 0.15mm."  KiCad's global min_via_annular_width covers vias only.
+(rule "Board_21-JLC PTH annular ring 0.15mm"
+	(constraint annular_width (min 0.15mm))
+	(condition "A.Pad_Type == 'Through-hole'"))
+
+# --------------------------------------------------------------------- Cost
+
+# Not a manufacturability limit.  "0.15mm hole size with any size via
+# diameter, and 0.2mm or 0.25mm hole size with via diameter less than
+# 0.45mm, will cost more."  Our vias are 0.45/0.20, exactly on the free
+# boundary -- this fires if anyone shrinks a via pad below it.
+(rule "Board_21-JLC via below the free-tooling boundary (cost, not a defect)"
+	(severity warning)
+	(constraint via_diameter (min 0.45mm))
+	(condition "A.Type == 'Via'"))
+(rule "Board_22-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_22-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_22-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
+(rule "Board_22-JLC SMD pad to SMD pad 0.15mm"
+	(constraint clearance (min 0.15mm))
+	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
+
+# "Via hole to Track: 0.2mm"
+(rule "Board_22-JLC via hole to track 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Type == 'Track'"))
+
+# "PTH to Track: 0.28mm" (0.35 mm recommended)
+(rule "Board_22-JLC PTH hole to track 0.28mm"
+	(constraint hole_clearance (min 0.28mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Type == 'Track'"))
+
+# "NPTH to Track: 0.2mm"
+(rule "Board_22-JLC NPTH hole to track 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical' && B.Type == 'Track'"))
+
+# "Inner layer via hole to copper clearance: 0.2mm"
+(rule "Board_22-JLC inner-layer via hole to copper 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Layer == 'In1.Cu'"))
+
+(rule "Board_22-JLC inner-layer via hole to copper 0.2mm (In2)"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Layer == 'In2.Cu'"))
+
+# "Inner layer PTH pad hole to copper clearance: 0.3mm"
+(rule "Board_22-JLC inner-layer PTH hole to copper 0.3mm"
+	(constraint hole_clearance (min 0.3mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Layer == 'In1.Cu'"))
+
+(rule "Board_22-JLC inner-layer PTH hole to copper 0.3mm (In2)"
+	(constraint hole_clearance (min 0.3mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Layer == 'In2.Cu'"))
+
+# ----------------------------------------------------------------- Drilling
+
+# "Pad Hole-to-Hole Spacing: 0.45mm".  Plated pads only -- mouse bites are
+# NPTH and JLC specifies them separately (see below), so scoping this to
+# 'Through-hole' keeps a panel from tripping a rule that does not apply to it.
+(rule "Board_22-JLC PTH hole to PTH hole 0.45mm"
+	(constraint hole_to_hole (min 0.45mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Pad_Type == 'Through-hole'"))
+
+# "Via Hole-to-Hole Spacing: 0.2mm"
+(rule "Board_22-JLC via hole to via hole 0.2mm"
+	(constraint hole_to_hole (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Type == 'Via'"))
+
+# "Min. Non-plated holes: 0.50mm".  Also the floor of the 0.5-0.8 mm range
+# JLC recommends for mouse bites, which is why tools/panelize.sh drills 0.5.
+(rule "Board_22-JLC minimum NPTH 0.5mm"
+	(constraint hole_size (min 0.5mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical'"))
+
+# "Mouse bites Panel: recommended distance between the two mouse-bites is
+# 0.2-0.3mm."  NPTH-to-NPTH only; the 0.45 mm pad rule above does not apply.
+(rule "Board_22-JLC mouse-bite hole spacing 0.2mm"
+	(constraint hole_to_hole (min 0.2mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical' && B.Pad_Type == 'NPTH, mechanical'"))
+
+# "PTH annular ring: multilayer 1 oz recommended 0.20mm or above, absolute
+# minimum 0.15mm."  KiCad's global min_via_annular_width covers vias only.
+(rule "Board_22-JLC PTH annular ring 0.15mm"
+	(constraint annular_width (min 0.15mm))
+	(condition "A.Pad_Type == 'Through-hole'"))
+
+# --------------------------------------------------------------------- Cost
+
+# Not a manufacturability limit.  "0.15mm hole size with any size via
+# diameter, and 0.2mm or 0.25mm hole size with via diameter less than
+# 0.45mm, will cost more."  Our vias are 0.45/0.20, exactly on the free
+# boundary -- this fires if anyone shrinks a via pad below it.
+(rule "Board_22-JLC via below the free-tooling boundary (cost, not a defect)"
+	(severity warning)
+	(constraint via_diameter (min 0.45mm))
+	(condition "A.Type == 'Via'"))
+(rule "Board_23-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_23-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_23-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
+(rule "Board_23-JLC SMD pad to SMD pad 0.15mm"
+	(constraint clearance (min 0.15mm))
+	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
+
+# "Via hole to Track: 0.2mm"
+(rule "Board_23-JLC via hole to track 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Type == 'Track'"))
+
+# "PTH to Track: 0.28mm" (0.35 mm recommended)
+(rule "Board_23-JLC PTH hole to track 0.28mm"
+	(constraint hole_clearance (min 0.28mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Type == 'Track'"))
+
+# "NPTH to Track: 0.2mm"
+(rule "Board_23-JLC NPTH hole to track 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical' && B.Type == 'Track'"))
+
+# "Inner layer via hole to copper clearance: 0.2mm"
+(rule "Board_23-JLC inner-layer via hole to copper 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Layer == 'In1.Cu'"))
+
+(rule "Board_23-JLC inner-layer via hole to copper 0.2mm (In2)"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Layer == 'In2.Cu'"))
+
+# "Inner layer PTH pad hole to copper clearance: 0.3mm"
+(rule "Board_23-JLC inner-layer PTH hole to copper 0.3mm"
+	(constraint hole_clearance (min 0.3mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Layer == 'In1.Cu'"))
+
+(rule "Board_23-JLC inner-layer PTH hole to copper 0.3mm (In2)"
+	(constraint hole_clearance (min 0.3mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Layer == 'In2.Cu'"))
+
+# ----------------------------------------------------------------- Drilling
+
+# "Pad Hole-to-Hole Spacing: 0.45mm".  Plated pads only -- mouse bites are
+# NPTH and JLC specifies them separately (see below), so scoping this to
+# 'Through-hole' keeps a panel from tripping a rule that does not apply to it.
+(rule "Board_23-JLC PTH hole to PTH hole 0.45mm"
+	(constraint hole_to_hole (min 0.45mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Pad_Type == 'Through-hole'"))
+
+# "Via Hole-to-Hole Spacing: 0.2mm"
+(rule "Board_23-JLC via hole to via hole 0.2mm"
+	(constraint hole_to_hole (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Type == 'Via'"))
+
+# "Min. Non-plated holes: 0.50mm".  Also the floor of the 0.5-0.8 mm range
+# JLC recommends for mouse bites, which is why tools/panelize.sh drills 0.5.
+(rule "Board_23-JLC minimum NPTH 0.5mm"
+	(constraint hole_size (min 0.5mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical'"))
+
+# "Mouse bites Panel: recommended distance between the two mouse-bites is
+# 0.2-0.3mm."  NPTH-to-NPTH only; the 0.45 mm pad rule above does not apply.
+(rule "Board_23-JLC mouse-bite hole spacing 0.2mm"
+	(constraint hole_to_hole (min 0.2mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical' && B.Pad_Type == 'NPTH, mechanical'"))
+
+# "PTH annular ring: multilayer 1 oz recommended 0.20mm or above, absolute
+# minimum 0.15mm."  KiCad's global min_via_annular_width covers vias only.
+(rule "Board_23-JLC PTH annular ring 0.15mm"
+	(constraint annular_width (min 0.15mm))
+	(condition "A.Pad_Type == 'Through-hole'"))
+
+# --------------------------------------------------------------------- Cost
+
+# Not a manufacturability limit.  "0.15mm hole size with any size via
+# diameter, and 0.2mm or 0.25mm hole size with via diameter less than
+# 0.45mm, will cost more."  Our vias are 0.45/0.20, exactly on the free
+# boundary -- this fires if anyone shrinks a via pad below it.
+(rule "Board_23-JLC via below the free-tooling boundary (cost, not a defect)"
+	(severity warning)
+	(constraint via_diameter (min 0.45mm))
+	(condition "A.Type == 'Via'"))
+(rule "Board_24-JLC BGA pad diameter 0.25mm"
+	(constraint assertion "A.Size_X >= 0.25mm && A.Size_Y >= 0.25mm")
+	(condition "A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer')"))
+
+# Electrical clearance intentionally ignores the same-net track that must
+# touch its own BGA pad.  The symmetric condition works whichever item KiCad
+# assigns to A or B.
+(rule "Board_24-JLC BGA pad to different-net track 0.10mm"
+	(constraint clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Track') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Track')"))
+
+# JLC warns that both the BGA pad and via may be cut back below this spacing.
+# This is a physical manufacturing constraint, so it must also check same-net
+# dogbone vias; ordinary electrical clearance would silently skip them.
+(rule "Board_24-JLC BGA pad to via copper 0.10mm"
+	(constraint physical_clearance (min 0.10mm))
+	(condition "(A.Type == 'Pad' && A.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && B.Type == 'Via') || (B.Type == 'Pad' && B.memberOfFootprint('carrier:BGA-67_6.5x8.0mm_Layout8x10_P0.8mm_Mirrored_Interposer') && A.Type == 'Via')"))
+
+# ------------------------------------------------------------------- Traces
+
+# "SMD pad to pad clearance (different nets): 0.15mm".  Stricter than our
+# 0.1 mm netclass clearance, and the netclass cannot express "SMD only".
+(rule "Board_24-JLC SMD pad to SMD pad 0.15mm"
+	(constraint clearance (min 0.15mm))
+	(condition "A.Pad_Type == 'SMD' && B.Pad_Type == 'SMD'"))
+
+# "Via hole to Track: 0.2mm"
+(rule "Board_24-JLC via hole to track 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Type == 'Track'"))
+
+# "PTH to Track: 0.28mm" (0.35 mm recommended)
+(rule "Board_24-JLC PTH hole to track 0.28mm"
+	(constraint hole_clearance (min 0.28mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Type == 'Track'"))
+
+# "NPTH to Track: 0.2mm"
+(rule "Board_24-JLC NPTH hole to track 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical' && B.Type == 'Track'"))
+
+# "Inner layer via hole to copper clearance: 0.2mm"
+(rule "Board_24-JLC inner-layer via hole to copper 0.2mm"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Layer == 'In1.Cu'"))
+
+(rule "Board_24-JLC inner-layer via hole to copper 0.2mm (In2)"
+	(constraint hole_clearance (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Layer == 'In2.Cu'"))
+
+# "Inner layer PTH pad hole to copper clearance: 0.3mm"
+(rule "Board_24-JLC inner-layer PTH hole to copper 0.3mm"
+	(constraint hole_clearance (min 0.3mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Layer == 'In1.Cu'"))
+
+(rule "Board_24-JLC inner-layer PTH hole to copper 0.3mm (In2)"
+	(constraint hole_clearance (min 0.3mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Layer == 'In2.Cu'"))
+
+# ----------------------------------------------------------------- Drilling
+
+# "Pad Hole-to-Hole Spacing: 0.45mm".  Plated pads only -- mouse bites are
+# NPTH and JLC specifies them separately (see below), so scoping this to
+# 'Through-hole' keeps a panel from tripping a rule that does not apply to it.
+(rule "Board_24-JLC PTH hole to PTH hole 0.45mm"
+	(constraint hole_to_hole (min 0.45mm))
+	(condition "A.Pad_Type == 'Through-hole' && B.Pad_Type == 'Through-hole'"))
+
+# "Via Hole-to-Hole Spacing: 0.2mm"
+(rule "Board_24-JLC via hole to via hole 0.2mm"
+	(constraint hole_to_hole (min 0.2mm))
+	(condition "A.Type == 'Via' && B.Type == 'Via'"))
+
+# "Min. Non-plated holes: 0.50mm".  Also the floor of the 0.5-0.8 mm range
+# JLC recommends for mouse bites, which is why tools/panelize.sh drills 0.5.
+(rule "Board_24-JLC minimum NPTH 0.5mm"
+	(constraint hole_size (min 0.5mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical'"))
+
+# "Mouse bites Panel: recommended distance between the two mouse-bites is
+# 0.2-0.3mm."  NPTH-to-NPTH only; the 0.45 mm pad rule above does not apply.
+(rule "Board_24-JLC mouse-bite hole spacing 0.2mm"
+	(constraint hole_to_hole (min 0.2mm))
+	(condition "A.Pad_Type == 'NPTH, mechanical' && B.Pad_Type == 'NPTH, mechanical'"))
+
+# "PTH annular ring: multilayer 1 oz recommended 0.20mm or above, absolute
+# minimum 0.15mm."  KiCad's global min_via_annular_width covers vias only.
+(rule "Board_24-JLC PTH annular ring 0.15mm"
+	(constraint annular_width (min 0.15mm))
+	(condition "A.Pad_Type == 'Through-hole'"))
+
+# --------------------------------------------------------------------- Cost
+
+# Not a manufacturability limit.  "0.15mm hole size with any size via
+# diameter, and 0.2mm or 0.25mm hole size with via diameter less than
+# 0.45mm, will cost more."  Our vias are 0.45/0.20, exactly on the free
+# boundary -- this fires if anyone shrinks a via pad below it.
+(rule "Board_24-JLC via below the free-tooling boundary (cost, not a defect)"
 	(severity warning)
 	(constraint via_diameter (min 0.45mm))
 	(condition "A.Type == 'Via'"))

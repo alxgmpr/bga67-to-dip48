@@ -58,21 +58,24 @@ RULES = {
     # Legend: "Minimum text height 40 mil (1.0mm)", "Minimum Line Width 0.15mm"
     'min_text_height':            (1.00, 'legend min text height'),
     'min_text_thickness':         (0.15, 'legend min line width'),
-    # Soldermask: "Soldermask Expansion 1:1".  Board-level expansion stays 0;
-    # the BGA footprint carries its own +0.05 locally.
-    'solder_mask_to_copper_clearance': (0.0, 'mask expansion is 1:1'),
+    # KiCad's practical zero-expansion floor.  This is the carrier project's
+    # authored value and is shared so DRC behaves identically on every board.
+    # The BGA footprint still carries its own +0.05 locally.
+    'solder_mask_to_copper_clearance': (0.005, 'shared carrier mask expansion'),
     # Blind/buried vias are not supported, so microvia limits are inert; leave
     # them at KiCad's defaults rather than implying microvias are available.
     'min_resolved_spokes':        (2, 'thermal relief spokes'),
 }
 
 
-def apply(path, check, manage_dru=True):
+def apply(path, check, manage_dru=True, rule_overrides=None):
     doc = json.loads(path.read_text())
     ds = doc.setdefault('board', {}).setdefault('design_settings', {})
     cur = ds.setdefault('rules', {})
     drift = []
-    for key, (val, why) in RULES.items():
+    project_rules = dict(RULES)
+    project_rules.update(rule_overrides or {})
+    for key, (val, why) in project_rules.items():
         if cur.get(key) != val:
             drift.append('%s: %s -> %s  (%s)' % (key, cur.get(key), val, why))
             cur[key] = val
@@ -94,7 +97,12 @@ def main():
         if not p.exists():
             print('skip (missing): %s' % p)
             continue
-        drift = apply(p, check, manage_dru)
+        # The panel's V-score/relief-slot keepouts deliberately require more
+        # copper clearance than an individually routed board edge.
+        overrides = ({'min_copper_edge_clearance':
+                      (0.30, 'panel V-score and relief-slot clearance')}
+                     if p.parent.name == 'panel' else None)
+        drift = apply(p, check, manage_dru, overrides)
         print('%s: %s' % (p.parent.name, 'in sync' if not drift else
                           ('%d change%s' % (len(drift), '' if len(drift) == 1 else 's'))))
         for d in drift:

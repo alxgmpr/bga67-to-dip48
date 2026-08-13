@@ -26,18 +26,19 @@ ringout:
 	@python3 tools/ringout.py docs/ringout-results.txt
 
 check: pinout
+	@python3 tools/check_mating.py
 	@$(KICAD_PY) tools/check_interposer.py 2>/dev/null
 	@./tools/drc-rules.py --check
-	@for p in carrier base; do \
+	@check_result=0; for p in carrier base; do \
 		printf '%-8s erc  ' $$p; \
 		$(KICAD_CLI) sch erc --exit-code-violations --severity-error \
 			-o /tmp/$$p-erc.json --format json $$p/$$p.kicad_sch >/dev/null 2>&1 \
-			&& echo clean || echo FAIL; \
+			&& echo clean || { echo FAIL; check_result=1; }; \
 		printf '%-8s drc  ' $$p; \
-		$(KICAD_CLI) pcb drc --exit-code-violations --severity-error \
+		$(KICAD_CLI) pcb drc --refill-zones --exit-code-violations --severity-error \
 			-o /tmp/$$p-drc.json --format json $$p/$$p.kicad_pcb >/dev/null 2>&1 \
-			&& echo clean || echo FAIL; \
-	done
+			&& echo clean || { echo FAIL; check_result=1; }; \
+	done; exit $$check_result
 
 clean:
 	@rm -f /tmp/carrier-drc.json /tmp/panel-drc.json /tmp/base-drc.json

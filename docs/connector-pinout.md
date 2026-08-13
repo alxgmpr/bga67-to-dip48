@@ -13,35 +13,42 @@ for mechanical strength but are not connector positions and carry no net. The ve
 model uses MT1 as its origin, so its KiCad transform is offset `(-3.275, -1.355, 0)`, with
 unit scale and zero rotation.
 
-## Courk-ordered DF40 mapping
+## Routed, same-number DF40 mapping
 
-Pins 7–26 reproduce Courk's ten NandBug DF17 pin pairs in the same order. The five surplus
-DF40 pair-columns are ground returns. This replaces the former checkerboard assignment and
-is the mapping that both PCBs must use.
+This table preserves the completed carrier routing. The base uses the identical table:
+plug `J1.n` mates to receptacle `J1.n`. Do not mirror this table again in the schematic or
+PCB nets; the bottom-side receptacle footprint handles the face-to-face mechanical mirror.
 
 | Pair | Odd pin | Even pin |
 |---:|---|---|
-| 1 | 1 GND | 2 GND |
-| 2 | 3 GND | 4 GND |
-| 3 | 5 GND | 6 GND |
-| 4 | 7 RY//BY | 8 ALE |
-| 5 | 9 /WE | 10 /WP |
-| 6 | 11 /CE | 12 /RE |
-| 7 | 13 CLE | 14 VCC |
-| 8 | 15 GND | 16 GND |
-| 9 | 17 GND | 18 IO5 |
-| 10 | 19 GND | 20 IO2 |
-| 11 | 21 IO6 | 22 IO1 |
-| 12 | 23 IO8 | 24 IO3 |
-| 13 | 25 IO7 | 26 IO4 |
-| 14 | 27 GND | 28 GND |
-| 15 | 29 GND | 30 GND |
+| 1 | 1 /WP | 2 GND |
+| 2 | 3 GND | 4 /WE |
+| 3 | 5 ALE | 6 VCC |
+| 4 | 7 GND | 8 /CE |
+| 5 | 9 /RE | 10 VCC |
+| 6 | 11 GND | 12 RY//BY |
+| 7 | 13 CLE | 14 GND |
+| 8 | 15 GND | 16 IO8 |
+| 9 | 17 IO1 | 18 GND |
+| 10 | 19 GND | 20 IO6 |
+| 11 | 21 IO2 | 22 GND |
+| 12 | 23 GND | 24 IO7 |
+| 13 | 25 IO3 | 26 GND |
+| 14 | 27 GND | 28 IO5 |
+| 15 | 29 IO4 | 30 GND |
 
 `tools/pinout.py` is the machine-readable source of truth. A pinout change is atomic: update
 carrier PCB/schematic, base PCB/schematic, this table, and the checker together.
 
-The boards mate face-to-face, so the base receptacle footprint mirrors the plug's X axis.
-Pin 1 must meet pin 1 in the mated 3D/mechanical check.
+The boards mate face-to-face, so the base receptacle footprint mirrors the plug geometry.
+Pin 1 must meet pin 1; a net-table mirror would double-mirror the interface and is forbidden.
+
+## DIP48 receptacle geometry
+
+`J2` is two top-side Samtec `SSM-124-L-SV` 1×24 friction socket strips, not a ZIF
+mechanism. The mating centrelines are 15.24 mm apart. Each strip uses 2.54 mm pitch and the
+manufacturer's staggered -SV pads: 1.27 × 1.02 mm at ±1.9275 mm from its mating centreline.
+The combined STEP model places both 60.96 × 2.54 × 7.49 mm housings at this exact spacing.
 
 ## NAND mapping
 

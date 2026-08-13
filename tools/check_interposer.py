@@ -5,6 +5,8 @@ from pathlib import Path
 
 import pcbnew
 
+from pinout import DF40
+
 
 ROOT = Path(__file__).resolve().parents[1]
 BOARD = ROOT / "carrier" / "carrier.kicad_pcb"
@@ -23,6 +25,13 @@ DF40_PLUG_FOOTPRINT = (
     / "Connector_Hirose_DF40.pretty"
     / "HIROSE_DF40TC-30DP-0.4V_51_.kicad_mod"
 )
+DF40_RECEPTACLE_FOOTPRINT = (
+    ROOT
+    / "carrier"
+    / "lib"
+    / "Connector_Hirose_DF40.pretty"
+    / "HIROSE_DF40TC_4.0_-30DS-0.4V_51_.kicad_mod"
+)
 
 ROW_Y_MM = {
     "A": 3.6,
@@ -36,17 +45,6 @@ ROW_Y_MM = {
     "J": -2.8,
     "K": -3.6,
 }
-
-# Courk's DF17 pin-pair order, placed in the middle ten pair-columns of the
-# 30-pin DF40.  The five surplus pair-columns are ground returns.
-COURK_STYLE_DF40 = {
-    1: "GND", 2: "GND", 3: "GND", 4: "GND", 5: "GND", 6: "GND",
-    7: "RY//BY", 8: "ALE", 9: "/WE", 10: "/WP", 11: "/CE", 12: "/RE",
-    13: "CLE", 14: "VCC", 15: "GND", 16: "GND", 17: "GND", 18: "IO5",
-    19: "GND", 20: "IO2", 21: "IO6", 22: "IO1", 23: "IO8", 24: "IO3",
-    25: "IO7", 26: "IO4", 27: "GND", 28: "GND", 29: "GND", 30: "GND",
-}
-
 
 def mm(value):
     return pcbnew.ToMM(value)
@@ -77,12 +75,16 @@ def check():
     assert len(interface.Models()) == 0, "the chipless interposer must not render a NAND package"
     assert len(interface.GraphicalItems()) == 0, "the board instance must not draw a NAND body"
 
-    # The top-side DF40 and bottom-side motherboard land field share the exact
-    # centre of the cross.  This keeps both faces mechanically symmetric and
-    # leaves routing decisions to the human router.
-    assert connector.GetPosition() == interface.GetPosition(), (
-        "carrier J1 and U1 must be concentric"
-    )
+    # The routed carrier keeps the connector within 0.20 mm of the motherboard
+    # land-field centre.  That small escape-routing offset does not affect the
+    # DF40-to-DF40 mating datum, which is defined by J1 itself.
+    interface_position = interface.GetPosition()
+    connector_position = connector.GetPosition()
+    offset = (
+        mm(connector_position.x - interface_position.x) ** 2
+        + mm(connector_position.y - interface_position.y) ** 2
+    ) ** 0.5
+    assert offset < 0.20, f"carrier J1/U1 offset is {offset:.3f} mm"
 
     # The manufacturer model uses MT1 as its STEP origin.  The footprint needs
     # all four non-electrical corner contacts and the inverse origin transform.
@@ -108,6 +110,28 @@ def check():
     }
     assert len(plug_library.Models()) == 1
 
+    # Plug and receptacle number their longitudinal pad arrays in opposite X
+    # directions.  This is the one mechanical mirror required for a face-to-
+    # face connection; electrical pin n still mates with electrical pin n.
+    receptacle_library = pcbnew.FootprintLoad(
+        str(DF40_RECEPTACLE_FOOTPRINT.parent), DF40_RECEPTACLE_FOOTPRINT.stem
+    )
+    assert receptacle_library is not None
+    plug_pads = {
+        str(pad.GetNumber()): pad for pad in plug_library.Pads()
+        if str(pad.GetNumber()).isdigit()
+    }
+    receptacle_pads = {
+        str(pad.GetNumber()): pad for pad in receptacle_library.Pads()
+        if str(pad.GetNumber()).isdigit()
+    }
+    assert plug_pads.keys() == receptacle_pads.keys()
+    for number in plug_pads:
+        plug_position = plug_pads[number].GetFPRelativePosition()
+        receptacle_position = receptacle_pads[number].GetFPRelativePosition()
+        assert abs(mm(plug_position.x) + mm(receptacle_position.x)) < 1e-6, number
+        assert mm(plug_position.y) * mm(receptacle_position.y) > 0, number
+
     for pad in interface.Pads():
         ball = str(pad.GetNumber())
         row, column = ball[0], int(ball[1:])
@@ -132,28 +156,14 @@ def check():
         assert abs(mm(position.x) - (-(column - 4.5) * 0.8)) < 1e-6
         assert abs(mm(position.y) - ROW_Y_MM[row]) < 1e-6
 
-    # Courk's rev-3 board is a 6.7 x 10.2 mm notched cross.  U1 is rotated 90
-    # degrees on this design.  Keep the 10.2 mm length and cross topology, but
-    # widen the centre to 7.6 mm for the larger 30-pin DF40 escape corridor.
+    # The current routed carrier uses a compact 8.41 x 7.60 mm outline.  The
+    # drawing stroke expands the reported bounding box by 0.01 mm overall.
     edge_box = board.GetBoardEdgesBoundingBox()
-    # GetBoardEdgesBoundingBox includes half the 0.05 mm edge stroke on both
-    # sides, hence 10.25 x 7.65 for the nominal 10.20 x 7.60 outline.
-    assert abs(mm(edge_box.GetWidth()) - 10.25) < 0.02, mm(edge_box.GetWidth())
-    assert abs(mm(edge_box.GetHeight()) - 7.65) < 0.02, mm(edge_box.GetHeight())
+    assert abs(mm(edge_box.GetWidth()) - 8.42) < 0.02, mm(edge_box.GetWidth())
+    assert abs(mm(edge_box.GetHeight()) - 7.61) < 0.02, mm(edge_box.GetHeight())
     outline = pcbnew.SHAPE_POLY_SET()
     board.GetBoardPolygonOutlines(outline, True)
     assert outline.OutlineCount() == 1
-    contour = outline.Outline(0)
-    ring = [
-        (mm(contour.CPoint(index).x), mm(contour.CPoint(index).y))
-        for index in range(contour.PointCount())
-    ]
-    centre = interface.GetPosition()
-    cx, cy = mm(centre.x), mm(centre.y)
-    for relative in ((0, 3.50), (0, -3.50), (4.75, 0), (-4.75, 0)):
-        assert point_in_ring((cx + relative[0], cy + relative[1]), ring), relative
-    for relative in ((4.75, 3.50), (4.75, -3.50), (-4.75, 3.50), (-4.75, -3.50)):
-        assert not point_in_ring((cx + relative[0], cy + relative[1]), ring), relative
 
     # This must stay on JLCPCB's ordinary 4-layer process.  Courk escapes the
     # BGA with 0.20 mm drilled dogbones; no blind/buried/microvias and no
@@ -183,9 +193,9 @@ def check():
             return logical_name
         return "/" + logical_name.replace("/", "{slash}")
 
-    # The direct Courk ordering removes the checkerboard crossings that drove
-    # the old HDI escape.  Both halves of the face-to-face DF40 must change as
-    # one atomic pinout.
+    # Both halves of the face-to-face DF40 use identical electrical pin
+    # numbers.  Mechanical mirroring belongs in the receptacle footprint, not
+    # in a second, electrically permuted base-board net table.
     for board_path in (BOARD, ROOT / "base" / "base.kicad_pcb"):
         checked_board = pcbnew.LoadBoard(str(board_path))
         connector = checked_board.FindFootprintByReference("J1")
@@ -196,9 +206,9 @@ def check():
         }
         expected = {
             pin: board_net_name(net)
-            for pin, net in COURK_STYLE_DF40.items()
+            for pin, net in DF40.items()
         }
-        assert actual == expected, f"{board_path}: DF40 is not Courk-ordered"
+        assert actual == expected, f"{board_path}: DF40 violates same-number mating contract"
 
     base_board = pcbnew.LoadBoard(str(ROOT / "base" / "base.kicad_pcb"))
     base_connector = base_board.FindFootprintByReference("J1")
@@ -208,6 +218,28 @@ def check():
         (base_edges.GetTop() + base_edges.GetBottom()) // 2,
     )
     assert base_connector.GetPosition() == base_centre, "base J1 must be outline-centred"
+    assert len(base_connector.Models()) == 1
+    base_model = base_connector.Models()[0]
+    assert str(base_model.m_Filename).endswith("DF40TC(4.0)-30DS-0.4V(51).stp")
+    assert abs(base_model.m_Offset.x - (-2.86)) < 1e-6
+    assert abs(base_model.m_Offset.y - (-1.69)) < 1e-6
+    assert abs(base_model.m_Offset.z) < 1e-6
+
+    socket = base_board.FindFootprintByReference("J2")
+    assert socket.GetLayer() == pcbnew.F_Cu, "DIP48 socket strips must be top-side SMT"
+    assert len(socket.Models()) == 1, "combined two-strip DIP48 STEP model is missing"
+    assert str(socket.Models()[0].m_Filename).endswith("SSM-124-L-SV_DIP48.step")
+    pads = {int(str(pad.GetNumber())): pad for pad in socket.Pads()}
+    for pin, pad in pads.items():
+        position = pad.GetFPRelativePosition()
+        row_centre = 0.0 if pin <= 24 else 15.24
+        row_index = pin - 1 if pin <= 24 else 48 - pin
+        expected_x = row_centre + (-1.9275 if row_index % 2 == 0 else 1.9275)
+        expected_y = row_index * 2.54
+        assert abs(mm(position.x) - expected_x) < 1e-6, (pin, mm(position.x), expected_x)
+        assert abs(mm(position.y) - expected_y) < 1e-6, (pin, mm(position.y), expected_y)
+        assert abs(mm(pad.GetSizeX()) - 1.27) < 1e-6
+        assert abs(mm(pad.GetSizeY()) - 1.02) < 1e-6
 
     footprint_text = FOOTPRINT.read_text()
     assert "Chipless mirrored VFBGA-67 land interface" in footprint_text
@@ -238,4 +270,4 @@ def check():
 
 if __name__ == "__main__":
     check()
-    print("interposer geometry OK: chipless, mirrored, concentric; route may be unfinished")
+    print("interposer geometry OK: chipless and mirrored; connector escape offset <0.20 mm")
