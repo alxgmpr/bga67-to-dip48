@@ -783,6 +783,17 @@ def check_chip():
         f"board C must use the normal land pattern, got {name}"
     )
 
+    # The netlist check cannot catch a plug left on board C: plug and receptacle
+    # share pin numbering by design, so a verbatim copy of the carrier passes it.
+    # Only the footprint identity distinguishes them.
+    connector_name = str(connector.GetFPID().GetLibItemName())
+    assert "30DS" in connector_name, (
+        f"board C needs the DF40 receptacle (30DS), got {connector_name}"
+    )
+    assert not {"MT1", "MT2", "MT3", "MT4"} & {
+        str(pad.GetNumber()) for pad in connector.Pads()
+    }, "board C's J1 has the plug's MT retention lands; it is still a plug"
+
     reference = read_footprint_pads(NORMAL_FOOTPRINT)
     placed = {
         str(pad.GetNumber()): (mm(pad.GetPosition().x), mm(pad.GetPosition().y))
