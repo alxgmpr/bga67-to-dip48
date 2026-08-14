@@ -124,8 +124,12 @@ def check_generic(board_path, pkg, role):
         ) ** 0.5
         assert offset < 0.20, f"{board_path}: J1/U1 offset is {offset:.3f} mm"
 
+        # gen_board.py never creates a NETINFO_ITEM for a family's NC_%d
+        # placeholder nets (see its net_names/pad-assignment loops) and
+        # leaves those J1 pads unconnected, so an unrouted "NC" pin reads
+        # back with an empty net name, not one literally called "NC_1".
         expected_nets = {
-            pin: board_net_name(net)
+            pin: ('' if net.startswith('NC_') else board_net_name(net))
             for pin, net in families.net_map(pkg.FAMILY).items()
         }
         actual_nets = {

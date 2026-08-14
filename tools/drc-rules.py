@@ -32,6 +32,8 @@ PROJECTS = [
     (ROOT / 'base' / 'base.kicad_pro', True),
     (ROOT / 'chip' / 'chip.kicad_pro', True),
     (ROOT / 'panel' / 'carrier-panel.kicad_pro', False),
+    (ROOT / 'boards' / 'emmc_bga153' / 'carrier' / 'carrier.kicad_pro', True),
+    (ROOT / 'boards' / 'emmc_bga153' / 'chip' / 'chip.kicad_pro', True),
 ]
 
 # key -> (value, why)
