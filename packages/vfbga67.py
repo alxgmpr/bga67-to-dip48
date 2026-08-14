@@ -6,8 +6,10 @@ PITCH_MM = 0.8
 LAND_MM = 0.40          # matches the shipped BGA-67 footprint's pad diameter
 GRID = ('ABCDEFGHJK', 8)  # 10 rows x 8 cols, 67 populated
 PROVENANCE = ('Transcribed from the shipped carrier board '
-              '(carrier/carrier.kicad_pcb U1 pad nets, verified against the '
-              'Home motherboard ring-out in docs/ringout-results.txt).')
+              '(carrier/carrier.kicad_pcb U1 pad nets); LAND_MM and GRID verified '
+              'against carrier/lib/carrier.pretty/'
+              'BGA-67_6.5x8.0mm_Layout8x10_P0.8mm.kicad_mod. Bench ring-out pending '
+              '(docs/ringout-results.txt is an unfilled template).')
 BALLS = {
     # ball: signal | 'VCC' | 'GND' | None (NC) — transcribed from U1 pad
     # nets on carrier/carrier.kicad_pcb, in row-major order.
