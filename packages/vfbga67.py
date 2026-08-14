@@ -5,6 +5,7 @@ BODY_MM = (6.5, 8.0)
 PITCH_MM = 0.8
 LAND_MM = 0.40          # matches the shipped BGA-67 footprint's pad diameter
 GRID = ('ABCDEFGHJK', 8)  # 10 rows x 8 cols, 67 populated
+CARRIER_ROT_DEG = 90  # matches the shipped board's U1 orientation
 PROVENANCE = ('Transcribed from the shipped carrier board '
               '(carrier/carrier.kicad_pcb U1 pad nets); LAND_MM and GRID verified '
               'against carrier/lib/carrier.pretty/'

@@ -10,11 +10,6 @@ MM = pcbnew.FromMM
 DF40_LIB = ROOT / 'carrier' / 'lib' / 'Connector_Hirose_DF40.pretty'
 PLUG = 'HIROSE_DF40TC-30DP-0.4V_51_'
 RECEPTACLE = 'HIROSE_DF40TC_4.0_-30DS-0.4V_51_'
-# Measured from the plug footprint's F.Courtyard bounding box (KiCad 10.0.5):
-# GetBoundingBox().GetWidth() == 8_070_000 nm exactly.  The brief's 11.34 mm
-# placeholder was the full pad-span bbox, not the courtyard; the courtyard is
-# the correct "keep-out body" figure for the outline formula below.
-DF40_BODY_MM = 8.07
 CENTRE = pcbnew.VECTOR2I(MM(100), MM(100))
 
 
@@ -27,6 +22,24 @@ def board_net_name(logical):
 def load_footprint(lib_dir, name):
     io = pcbnew.PCB_IO_KICAD_SEXPR()
     return io.FootprintLoad(str(lib_dir), name)
+
+
+def courtyard_span_mm(fp):
+    """Width of fp's F.Courtyard bounding box, in mm.
+
+    Falls back to the full footprint bounding box (pads included) if no
+    courtyard-layer graphics can be found.  Read right after FootprintLoad,
+    before any rotation/flip, so it always sees the library's native F.CrtYd
+    layer rather than a post-flip B.CrtYd.
+    """
+    items = [gi for gi in fp.GraphicalItems() if gi.GetLayer() == pcbnew.F_CrtYd]
+    if items:
+        bbox = items[0].GetBoundingBox()
+        for gi in items[1:]:
+            bbox.Merge(gi.GetBoundingBox())
+    else:
+        bbox = fp.GetBoundingBox()
+    return pcbnew.ToMM(bbox.GetWidth())
 
 
 def generate(pkg, role, out_path):
@@ -54,12 +67,13 @@ def generate(pkg, role, out_path):
     board.Add(u1)
     u1.SetPosition(CENTRE)
     if role == 'carrier':
-        # The land field's row/column axes run 90 degrees off the board's
-        # DF40 escape axis on the shipped carrier (see carrier/carrier.kicad_pcb
-        # U1: orientation 90, FPID *_Mirrored_Interposer).  Rotate before the
-        # mirror-flip so the flip's -90 -> 90 fixed point reproduces that
-        # placement exactly (verified pad-for-pad against the shipped board).
-        u1.SetOrientationDegrees(90)
+        # Package-specific: some shipped boards seat the land field rotated
+        # relative to the DF40 escape axis (see packages/vfbga67.py's
+        # CARRIER_ROT_DEG).  Set the pre-flip angle the package asks for
+        # (default 0); KiCad's flip then remaps it to 180-theta, which is why
+        # vfbga67's 90 degrees reads back as 90 after the flip below (its own
+        # fixed point) rather than 0 staying 0.
+        u1.SetOrientationDegrees(getattr(pkg, 'CARRIER_ROT_DEG', 0))
         if u1.GetLayer() != pcbnew.B_Cu:
             u1.Flip(u1.GetPosition(), pcbnew.FLIP_DIRECTION_LEFT_RIGHT)
     for pad in u1.Pads():
@@ -69,12 +83,21 @@ def generate(pkg, role, out_path):
 
     # J1: DF40.
     j1 = load_footprint(DF40_LIB, PLUG if role == 'carrier' else RECEPTACLE)
+    # Read the connector's own courtyard span before any rotation/flip so the
+    # outline formula below uses each role's real footprint extent (the
+    # plug's for carrier, the receptacle's for chip) rather than a single
+    # shared constant.
+    connector_span_mm = courtyard_span_mm(j1)
     j1.SetReference('J1')
     board.Add(j1)
     j1.SetPosition(CENTRE)
     if role == 'carrier':
         j1.SetOrientationDegrees(180)
     if role == 'chip' and j1.GetLayer() != pcbnew.B_Cu:
+        # KiCad's flip remaps orientation theta -> 180-theta; a footprint
+        # loaded at its native 0 degrees therefore reads back as 180 degrees
+        # after this call.  Same side effect build_chip.py's connector.Flip()
+        # already relies on for the real chip board.
         j1.Flip(j1.GetPosition(), pcbnew.FLIP_DIRECTION_LEFT_RIGHT)
     pin_nets = families.net_map(pkg.FAMILY)
     for pad in j1.Pads():
@@ -87,8 +110,11 @@ def generate(pkg, role, out_path):
             # DF40 mechanical/shield tabs; tied to GND on the shipped boards.
             pad.SetNet(nets['GND'])
 
-    # Outline.
-    w = max(pkg.BODY_MM[0], DF40_BODY_MM) + 1.0
+    # Outline.  Each role's connector footprint sets its own minimum span;
+    # the shipped chip board deliberately uses a smaller outline than the
+    # receptacle courtyard (8.41 mm vs. 9.15 mm) once routed by hand, so this
+    # generated width is a default starting point, not a floor to preserve.
+    w = max(pkg.BODY_MM[0], connector_span_mm) + 1.0
     h = pkg.BODY_MM[1] + 1.6
     w, h = round(w, 2), round(h, 2)
     cx, cy = pcbnew.ToMM(CENTRE.x), pcbnew.ToMM(CENTRE.y)
