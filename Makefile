@@ -2,7 +2,7 @@ KICAD_CLI ?= /Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli
 
 KICAD_PY ?= /Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python
 
-.PHONY: help panel check pinout rules ringout clean
+.PHONY: help panel check suite-check pinout rules ringout clean
 
 help:
 	@echo "make rules    push the JLCPCB 4-layer rule set into every project"
@@ -25,7 +25,16 @@ pinout:
 ringout:
 	@python3 tools/ringout.py docs/ringout-results.txt
 
-check: pinout
+suite-check:
+	@python3 tools/pinout.py >/dev/null && python3 tools/families.py
+	@python3 tools/check_package.py
+	@python3 tools/tests/test_families.py
+	@python3 tools/tests/test_vfbga67_package.py
+	@$(KICAD_PY) tools/tests/test_gen_footprint.py 2>/dev/null
+	@$(KICAD_PY) tools/tests/test_gen_board.py 2>/dev/null
+	@$(KICAD_PY) tools/check_interposer.py --all-boards 2>/dev/null
+
+check: suite-check pinout
 	@python3 tools/check_mating.py
 	@$(KICAD_PY) tools/check_interposer.py 2>/dev/null
 	@./tools/drc-rules.py --check
