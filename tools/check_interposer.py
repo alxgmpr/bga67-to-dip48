@@ -84,10 +84,12 @@ def check_generic(board_path, pkg, role):
       0.325 mm of a DF40 land or within LAND_MM/2 of a U1 pad centre (strict
       no-via-in-pad; this role never uses an epoxy-filled process).
     role='chip': U1 is the real, non-mirrored package on F.Cu and J1 is the
-      DF40 receptacle on B.Cu.  Any via whose centre falls inside a U1 pad
-      must satisfy the JLC "Epoxy Filled & Capped" via-in-pad rules: drill
-      0.15-0.55 mm, annular ring >= 0.05 mm, via land <= LAND_MM, and no
-      soldermask opening on either face.
+      DF40 receptacle on B.Cu.  Every via on the board must have a fillable
+      drill (0.15-0.55 mm) and an adequate annular ring (>= 0.05 mm) -- the
+      whole board is fabricated with JLC's "Epoxy Filled & Capped" process
+      once any via uses it.  Any via whose centre additionally falls inside
+      a U1 pad must also have a land no wider than LAND_MM and be tented on
+      both faces (no soldermask opening either side).
 
     Returns the loaded board so callers can layer additional, non-generic
     checks onto it without a second LoadBoard.
@@ -179,6 +181,19 @@ def check_generic(board_path, pkg, role):
             drill = mm(via.GetDrillValue())
             land = mm(via.GetWidth(pcbnew.F_Cu))
             via_position = via.GetPosition()
+            # The whole board is fabricated with JLC's "Epoxy Filled &
+            # Capped" process once any via uses it, so the fillable-drill
+            # and annular-ring floors apply to every via on a chip-role
+            # board, not just the ones that happen to land inside a pad.
+            assert 0.15 - 1e-6 <= drill <= 0.55 + 1e-6, (
+                f"{board_path}: {via.GetNetname()} drill {drill:.3f} mm "
+                "is outside JLC's 0.15-0.55 mm fillable range"
+            )
+            assert (land - drill) / 2 >= 0.05 - 1e-6, (
+                f"{board_path}: {via.GetNetname()} annular ring "
+                f"{(land - drill) / 2:.3f} mm is under the 0.05 mm "
+                "minimum"
+            )
             for pad in interface_pads:
                 pad_position = pad.GetPosition()
                 separation = (
@@ -187,19 +202,10 @@ def check_generic(board_path, pkg, role):
                 ) ** 0.5
                 if separation >= pkg.LAND_MM / 2:
                     continue
-                # This via lands inside a ball pad.  JLC's "Epoxy Filled &
-                # Capped" process requires a fillable drill, adequate
-                # annular ring, copper no wider than the ball it sits in,
-                # and full tenting on both faces.
-                assert 0.15 - 1e-6 <= drill <= 0.55 + 1e-6, (
-                    f"{board_path}: {via.GetNetname()} drill {drill:.3f} mm "
-                    "is outside JLC's 0.15-0.55 mm fillable range"
-                )
-                assert (land - drill) / 2 >= 0.05 - 1e-6, (
-                    f"{board_path}: {via.GetNetname()} annular ring "
-                    f"{(land - drill) / 2:.3f} mm is under the 0.05 mm "
-                    "minimum"
-                )
+                # This via lands inside a ball pad.  Its copper must not
+                # stick out past the land, and must be fully tented on both
+                # faces -- filled-and-capped vias have no soldermask
+                # opening on either face.
                 assert land <= pkg.LAND_MM + 1e-6, (
                     f"{board_path}: {via.GetNetname()} via land {land:.3f} "
                     f"mm is wider than the {pkg.LAND_MM:.3f} mm U1 land, so "
