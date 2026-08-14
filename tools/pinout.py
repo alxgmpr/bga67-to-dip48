@@ -12,6 +12,16 @@ DF40 = {
   19:'GND', 20:'IO6', 21:'IO2', 22:'GND', 23:'GND', 24:'IO7',
   25:'IO3', 26:'GND', 27:'GND', 28:'IO5', 29:'IO4', 30:'GND',
 }
+# Universal contract positions.  'S' marks the 15 signal positions; families
+# assign their signals onto them via tools/families.py.  Pin 10 is the VCCQ
+# position: single-supply families strap it to VCC on the base, which is why
+# the shipped nand_x8 boards carry net VCC there.
+POSITIONS = {
+    p: ('GND' if DF40[p] == 'GND' else 'VCC' if p == 6
+        else 'VCCQ' if p == 10 else 'S')
+    for p in DF40
+}
+
 def check():
     sig=lambda n: n not in ('GND','VCC')
     nets=[v for v in DF40.values() if sig(v)]
