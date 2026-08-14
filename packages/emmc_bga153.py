@@ -24,6 +24,19 @@ PROVENANCE = (
     'the internally-tied vendor-specific VSF2-VSF7 balls also ->None, as '
     'this design assigns them no function, same as NC).'
 )
+# Chip-role local decoupling: 1 uF across VCC-GND, 1 uF across VCCQ-GND,
+# 100 nF across AUX_VDDI-GND, flanking the DF40 receptacle.  Y offset scaled
+# from build_chip.py's CAP_OFFSET_MM=2.9 (sized for VFBGA67's 7.60 mm-tall
+# outline) to this package's taller 13.0 mm body: BODY_MM[1]/2 - 1.2 = 5.3
+# mm.  Three caps need two rows: C1/C2 share the near row split +-2.0 mm in
+# X (clear of the DF40 receptacle body, half-height 3.3 mm); C3 centres the
+# far row.  Both rows sit 2.0 mm inside the generated 14.61 mm-tall outline.
+CHIP_CAPS = [
+    # (ref, value, "Lib:Footprint", net_a, net_b, dx_mm, dy_mm)
+    ('C1', '1uF', 'Capacitor_SMD:C_0402_1005Metric', 'VCC', 'GND', -2.0, -5.3),
+    ('C2', '1uF', 'Capacitor_SMD:C_0402_1005Metric', 'VCCQ', 'GND', 2.0, -5.3),
+    ('C3', '100nF', 'Capacitor_SMD:C_0402_1005Metric', 'AUX_VDDI', 'GND', 0.0, 5.3),
+]
 BALLS = {
     # Generated from docs/ballouts/emmc_bga153.txt; see PROVENANCE for the
     # symbol-to-signal mapping rules. Do not hand-edit without regenerating.

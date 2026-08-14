@@ -11,6 +11,15 @@ DF40_LIB = ROOT / 'carrier' / 'lib' / 'Connector_Hirose_DF40.pretty'
 PLUG = 'HIROSE_DF40TC-30DP-0.4V_51_'
 RECEPTACLE = 'HIROSE_DF40TC_4.0_-30DS-0.4V_51_'
 CENTRE = pcbnew.VECTOR2I(MM(100), MM(100))
+# KiCad's own global footprint libraries, installed alongside the KiCad app
+# bundle (same install this repo already hardcodes a default path for via
+# the Makefile's KICAD_PY/KICAD_CLI).  Used for generic passives referenced
+# by a package's CHIP_CAPS -- follows the shipped chip board's own
+# convention of pointing straight at "Capacitor_SMD:C_0402_1005Metric"
+# rather than vendoring a copy into a project-local .pretty (see
+# chip/chip.kicad_pcb, chip/fp-lib-table).
+STANDARD_FOOTPRINTS_DIR = pathlib.Path(
+    '/Applications/KiCad/KiCad.app/Contents/SharedSupport/footprints')
 
 
 def board_net_name(logical):
@@ -22,6 +31,12 @@ def board_net_name(logical):
 def load_footprint(lib_dir, name):
     io = pcbnew.PCB_IO_KICAD_SEXPR()
     return io.FootprintLoad(str(lib_dir), name)
+
+
+def load_standard_footprint(fpid):
+    """Load 'Lib:Footprint' straight out of KiCad's global libraries."""
+    lib, name = fpid.split(':', 1)
+    return load_footprint(STANDARD_FOOTPRINTS_DIR / (lib + '.pretty'), name)
 
 
 def courtyard_span_mm(fp):
@@ -109,6 +124,31 @@ def generate(pkg, role, out_path):
         elif number.startswith('MT'):
             # DF40 mechanical/shield tabs; tied to GND on the shipped boards.
             pad.SetNet(nets['GND'])
+
+    # Chip-role local decoupling: optional, package-specific.  Each pkg.
+    # CHIP_CAPS entry is (ref, value, "Lib:Footprint", net_a, net_b, dx_mm,
+    # dy_mm); dx/dy are relative to CENTRE.  Placed on B.Cu with pad "1" ->
+    # net_a and pad "2" -> net_b, mirroring build_chip.py's C1/C2 flow for
+    # the shipped VFBGA67 chip board, generalized so any package can declare
+    # its own local caps instead of that flow being hand-rolled per board.
+    if role == 'chip':
+        for ref, value, fpid, net_a, net_b, dx, dy in getattr(pkg, 'CHIP_CAPS', []):
+            cap = load_standard_footprint(fpid)
+            cap.SetReference(ref)
+            cap.SetValue(value)
+            board.Add(cap)
+            cap.SetPosition(pcbnew.VECTOR2I(CENTRE.x + MM(dx), CENTRE.y + MM(dy)))
+            if cap.GetLayer() != pcbnew.B_Cu:
+                cap.Flip(cap.GetPosition(), pcbnew.FLIP_DIRECTION_LEFT_RIGHT)
+            cap.SetOrientationDegrees(0)
+            for pad in cap.Pads():
+                number = str(pad.GetNumber())
+                if number == '1':
+                    pad.SetNet(nets[net_a])
+                elif number == '2':
+                    pad.SetNet(nets[net_b])
+                else:
+                    raise AssertionError('unexpected pad %r on %s' % (number, ref))
 
     # Outline.  Each role's connector footprint sets its own minimum span;
     # the shipped chip board deliberately uses a smaller outline than the
