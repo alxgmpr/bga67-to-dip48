@@ -30,6 +30,7 @@ suite-check:
 	@python3 tools/check_package.py
 	@python3 tools/tests/test_families.py
 	@python3 tools/tests/test_vfbga67_package.py
+	@python3 tools/tests/test_emmc_bga153.py
 	@$(KICAD_PY) tools/tests/test_gen_footprint.py 2>/dev/null
 	@$(KICAD_PY) tools/tests/test_gen_board.py 2>/dev/null
 	@$(KICAD_PY) tools/check_interposer.py --all-boards 2>/dev/null
