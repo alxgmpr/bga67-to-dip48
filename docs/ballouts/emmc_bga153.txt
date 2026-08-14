@@ -11,7 +11,8 @@
 #     across 14 columns, Ø0.30mm SMD ball pads confirmed.
 #
 # Literal symbols as printed in Figure 3 (mapped to our overlay/rail names by
-# tools/gen_emmc_bga153_dict.py, not here):
+# a throwaway script, not committed to this repo; the symbol->signal mapping
+# rules stated below are the authoritative record):
 #   DAT0-DAT7, CLK, CMD, RST_n, DS  - eMMC signal balls (emmc overlay)
 #   VCCM   - NAND flash core supply, 2.70-3.60V     -> VCC
 #   VCCQM  - controller core + I/F I/O supply, 1.70-1.95V -> VCCQ

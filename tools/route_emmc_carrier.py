@@ -30,8 +30,10 @@ y = 98.645 / 101.355.  Three numbers decide every routing choice:
 That leaves four via regions: the strips outside the field, the moat (the
 vacant ring at column 4 / column 11 / row D / row L, usable only where it
 clears the DF40 rows), and the vacant 4x4 block enclosed by the inner ball
-ring.  Balls in row B and ball N2 touch none of them and are left unrouted;
-see the task report.
+ring.  Balls in row B and ball N2 touch none of them and are left unrouted:
+/DAT3, /DAT4, /DAT5, /DAT6, /DAT7 at balls B2-B6, and GND ball N2's pour
+island.  Escape at 0.5 mm pitch is blocked pending a via-in-pad/land-size
+decision.
 """
 import sys
 from pathlib import Path

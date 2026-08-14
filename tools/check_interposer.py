@@ -75,21 +75,38 @@ def point_in_ring(point, ring):
     return inside
 
 
+def _expected_j1_nets(pkg):
+    """Pin -> expected J1 net name for pkg's family, board_net_name'd.
+
+    gen_board.py never creates a NETINFO_ITEM for a family's NC_%d
+    placeholder nets (see its net_names/pad-assignment loops) and leaves
+    those J1 pads unconnected, so an unrouted "NC" pin reads back with an
+    empty net name, not one literally called "NC_1".
+    """
+    return {
+        pin: ('' if net.startswith('NC_') else board_net_name(net))
+        for pin, net in families.net_map(pkg.FAMILY).items()
+    }
+
+
 def check_generic(board_path, pkg, role):
     """Package-parameterized carrier/chip geometry and net checks.
 
     role='carrier': U1 (the BGA land field) is mirrored and on B.Cu, chipless
-      (no 3D model or drawn body), escape-routed to J1 within 0.20 mm, J1's
-      pin-numbered pads carry pkg's family net map, and no via comes within
-      0.325 mm of a DF40 land or within LAND_MM/2 of a U1 pad centre (strict
-      no-via-in-pad; this role never uses an epoxy-filled process).
+      (no 3D model or drawn body), escape-routed to J1 within 0.20 mm, J1 is
+      the DF40 plug ("30DP" in its footprint name) on F.Cu, J1's pin-numbered
+      pads carry pkg's family net map, and no via comes within 0.325 mm of a
+      DF40 land or within LAND_MM/2 of a U1 pad centre (strict no-via-in-pad;
+      this role never uses an epoxy-filled process).
     role='chip': U1 is the real, non-mirrored package on F.Cu and J1 is the
-      DF40 receptacle on B.Cu.  Every via on the board must have a fillable
-      drill (0.15-0.55 mm) and an adequate annular ring (>= 0.05 mm) -- the
-      whole board is fabricated with JLC's "Epoxy Filled & Capped" process
-      once any via uses it.  Any via whose centre additionally falls inside
-      a U1 pad must also have a land no wider than LAND_MM and be tented on
-      both faces (no soldermask opening either side).
+      DF40 receptacle ("30DS" in its footprint name) on B.Cu, carrying pkg's
+      family net map same as the carrier's J1.  Every via on the board must
+      have a fillable drill (0.15-0.55 mm) and an adequate annular ring
+      (>= 0.05 mm) -- the whole board is fabricated with JLC's "Epoxy Filled
+      & Capped" process once any via uses it.  Any via whose centre
+      additionally falls inside a U1 pad must also have a land no wider than
+      LAND_MM and be tented on both faces (no soldermask opening either
+      side).
 
     Returns the loaded board so callers can layer additional, non-generic
     checks onto it without a second LoadBoard.
@@ -124,14 +141,16 @@ def check_generic(board_path, pkg, role):
         ) ** 0.5
         assert offset < 0.20, f"{board_path}: J1/U1 offset is {offset:.3f} mm"
 
-        # gen_board.py never creates a NETINFO_ITEM for a family's NC_%d
-        # placeholder nets (see its net_names/pad-assignment loops) and
-        # leaves those J1 pads unconnected, so an unrouted "NC" pin reads
-        # back with an empty net name, not one literally called "NC_1".
-        expected_nets = {
-            pin: ('' if net.startswith('NC_') else board_net_name(net))
-            for pin, net in families.net_map(pkg.FAMILY).items()
-        }
+        connector_name = str(connector.GetFPID().GetLibItemName())
+        assert "30DP" in connector_name, (
+            f"{board_path}: carrier J1 needs the DF40 plug (30DP), got "
+            f"{connector_name}"
+        )
+        assert connector.GetLayer() == pcbnew.F_Cu, (
+            f"{board_path}: carrier J1 plug must be on F.Cu"
+        )
+
+        expected_nets = _expected_j1_nets(pkg)
         actual_nets = {
             int(str(pad.GetNumber())): str(pad.GetNetname())
             for pad in connector.Pads()
@@ -176,6 +195,22 @@ def check_generic(board_path, pkg, role):
         assert "Mirrored" not in footprint_name, footprint_name
         assert connector.GetLayer() == pcbnew.B_Cu, (
             f"{board_path}: chip J1 receptacle must be on B.Cu"
+        )
+
+        connector_name = str(connector.GetFPID().GetLibItemName())
+        assert "30DS" in connector_name, (
+            f"{board_path}: chip J1 needs the DF40 receptacle (30DS), got "
+            f"{connector_name}"
+        )
+
+        expected_nets = _expected_j1_nets(pkg)
+        actual_nets = {
+            int(str(pad.GetNumber())): str(pad.GetNetname())
+            for pad in connector.Pads()
+            if str(pad.GetNumber()).isdigit()
+        }
+        assert actual_nets == expected_nets, (
+            f"{board_path}: J1 nets do not match {pkg.FAMILY} net_map"
         )
 
         interface_pads = list(interface.Pads())
